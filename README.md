@@ -18,9 +18,9 @@ npm install
 
 ## Admin User Creation
 
-To create a user with the role of `admin`, you need to run database migration.
+To create a user with the role of `admin`, you need to run seed script.
 
-## Database Migration
+## Database Migration and Seed
 
 Make sure you have populated `.env.migrations` file with the necessary environment variables. You can use the `.env.migrations.example` file as a template.
 
@@ -29,7 +29,7 @@ Make sure you have populated `.env.migrations` file with the necessary environme
 cp .env.migrations.example .env.migrations
 ```
 
-For running the database migration, you need to have a MongoDB instance running. You can use the following command to run a MongoDB instance using Docker Compose.
+For running the migrations and seed scripts, you need to have a MongoDB instance running. You can use the following command to run a MongoDB instance using Docker Compose.
 
 ```bash
 # Before starting the migration:
@@ -48,6 +48,11 @@ npx migrate-mongo create <migration-name>
 
 # Check the status of migrations
 npx migrate-mongo status
+```
+
+```bash
+# Run the seed script to create an admin user
+npm run seed:create:admin
 ```
 
 ```bash

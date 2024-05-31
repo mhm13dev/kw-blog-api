@@ -21,7 +21,8 @@
     "docker:start:dev": "docker compose -f docker-compose.yml up -d",
     "docker:stop:dev": "docker compose -f docker-compose.yml down",
     "docker:start:migrations": "docker compose -f docker-compose.migrations.yml up -d",
-    "docker:stop:migrations": "docker compose -f docker-compose.migrations.yml down"
+    "docker:stop:migrations": "docker compose -f docker-compose.migrations.yml down",
+    "seed:create:admin": "ts-node -r tsconfig-paths/register ./src/seeds/create-admin.ts"
   },
   "dependencies": {
     "@apollo/server": "^4.10.4",
