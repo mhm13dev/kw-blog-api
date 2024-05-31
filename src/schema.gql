@@ -21,10 +21,16 @@ type Query {
 
 type Mutation {
   registerUser(registerUserInput: RegisterUserInput!): User!
+  loginUser(loginUserInput: LoginUserInput!): User!
 }
 
 input RegisterUserInput {
   email: String!
   password: String!
   confirm_password: String!
+}
+
+input LoginUserInput {
+  email: String!
+  password: String!
 }

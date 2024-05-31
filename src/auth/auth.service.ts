@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { User } from 'src/user/user.entity';
 import { UserService } from 'src/user/user.service';
-import { RegisterUserInput } from './dto/register-user.input';
+import { LoginUserInput, RegisterUserInput } from './dto';
 
 @Injectable()
 export class AuthService {
@@ -28,5 +28,19 @@ export class AuthService {
       password: registerUserInput.password,
       name: registerUserInput.email.split('@')[0],
     });
+  }
+
+  async loginUser(loginUserInput: LoginUserInput): Promise<User> {
+    const user = await this.userService.findOneByEmail(loginUserInput.email);
+
+    if (!user) {
+      throw new BadRequestException('Invalid credentials');
+    }
+
+    if (!(await user.comparePassword(loginUserInput.password))) {
+      throw new BadRequestException('Invalid credentials');
+    }
+
+    return user;
   }
 }

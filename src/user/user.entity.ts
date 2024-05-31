@@ -59,4 +59,8 @@ export class User {
       this.password = await argon2.hash(this.password);
     }
   }
+
+  async comparePassword(attemptedPassword: string): Promise<boolean> {
+    return argon2.verify(this.password, attemptedPassword);
+  }
 }
