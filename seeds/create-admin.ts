@@ -6,7 +6,16 @@ async function createAdmin() {
   await AppDataSource.initialize();
 
   try {
-    // Create data using TypeORM entities (not for storage)
+    // Check if the admin already exists
+    const adminExists = await AppDataSource.manager.findOneBy(User, {
+      role: UserRole.admin,
+    });
+    if (!!adminExists) {
+      console.log('Admin already exists');
+      return;
+    }
+
+    // Create data using TypeORM entities
     const admin = new User();
     admin.email = 'admin@kwanso.com';
     admin.name = 'admin';
@@ -16,7 +25,7 @@ async function createAdmin() {
     // Save data to the database
     await AppDataSource.manager.save(admin);
 
-    console.log('Data seeded successfully');
+    console.log('Admin created successfully');
   } finally {
     await AppDataSource.destroy();
   }

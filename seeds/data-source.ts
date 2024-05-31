@@ -2,7 +2,7 @@ import 'reflect-metadata';
 import path from 'path';
 import dotenv from 'dotenv';
 dotenv.config({
-  path: path.resolve(__dirname, '../../.env.migrations'),
+  path: path.resolve(__dirname, '../.env.migrations'),
 });
 import { DataSource } from 'typeorm';
 import { User } from 'src/user/entities';
