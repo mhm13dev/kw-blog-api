@@ -14,6 +14,7 @@ import { User } from 'src/user/entities';
 import { UserService } from 'src/user/user.service';
 import { BlogPostService } from 'src/blog-post/blog-post.service';
 import { BlogPost } from 'src/blog-post/entities';
+import { ObjectIdDto } from 'src/common/dto';
 import { CreatePostCommentInput, GetPostCommentsInput } from './dto';
 import { PostComment } from './entities';
 import { PostCommentService } from './post-comment.service';
@@ -42,6 +43,18 @@ export class PostCommentResolver {
     @Input() input: GetPostCommentsInput,
   ): Promise<PostComment[]> {
     return this.postCommentService.getPostComments(input);
+  }
+
+  @Mutation(() => Boolean)
+  @UseGuards(GqlAccessTokenGuard)
+  deletePostComment(
+    @CurrentUserPayload() currentUserPayload: TokenPayload,
+    @Input() input: ObjectIdDto,
+  ): Promise<boolean> {
+    return this.postCommentService.deletePostComment(
+      currentUserPayload,
+      input._id,
+    );
   }
 
   @ResolveField('author', () => User)

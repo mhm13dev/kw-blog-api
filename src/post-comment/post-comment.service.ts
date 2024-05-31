@@ -1,6 +1,11 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { MongoRepository } from 'typeorm';
 import { ObjectId } from 'mongodb';
 import { TokenPayload } from 'src/auth/types/jwt.types';
 import { BlogPostService } from 'src/blog-post/blog-post.service';
@@ -11,7 +16,7 @@ import { PostComment } from './entities';
 export class PostCommentService {
   constructor(
     @InjectRepository(PostComment)
-    private readonly postCommentRepository: Repository<PostComment>,
+    private readonly postCommentRepository: MongoRepository<PostComment>,
     private readonly blogPostService: BlogPostService,
   ) {}
 
@@ -63,6 +68,55 @@ export class PostCommentService {
       order: {
         createdAt: input.sort,
       },
+    });
+  }
+
+  async deletePostComment(
+    currentUserPayload: TokenPayload,
+    commentId: ObjectId,
+  ): Promise<boolean> {
+    const postComment = await this.postCommentRepository.findOneBy({
+      _id: commentId,
+    });
+    if (!postComment) {
+      throw new NotFoundException('Comment not found');
+    }
+    if (!postComment.author_id.equals(new ObjectId(currentUserPayload.sub))) {
+      throw new ForbiddenException('You are not the author of this comment');
+    }
+    // If the comment has nested comments, delete them as well
+    await this.deleteCommentAndAllNestedComments(postComment._id);
+    return true;
+  }
+
+  private async deleteCommentAndAllNestedComments(commentId: ObjectId) {
+    const commentIdsToDelete: ObjectId[] = [commentId];
+
+    async function recurse(
+      commentId: ObjectId,
+      postCommentRepository: MongoRepository<PostComment>,
+      commentIdsToDelete: ObjectId[],
+    ) {
+      // Get all comments that are replying to the comment
+      const comments = await postCommentRepository.find({
+        where: {
+          reply_to_comment_id: commentId,
+        },
+      });
+      if (comments.length === 0) {
+        return;
+      }
+      // Recursively delete all nested comments
+      for (const comment of comments) {
+        commentIdsToDelete.push(comment._id);
+        await recurse(comment._id, postCommentRepository, commentIdsToDelete);
+      }
+    }
+    await recurse(commentId, this.postCommentRepository, commentIdsToDelete);
+
+    // Delete all comments
+    await this.postCommentRepository.deleteMany({
+      _id: { $in: commentIdsToDelete },
     });
   }
 

@@ -93,6 +93,7 @@ type Mutation {
   updatePost(input: UpdateBlogPostInput!): BlogPost!
   deletePost(input: ObjectIdDto!): Boolean!
   createPostComment(input: CreatePostCommentInput!): PostComment!
+  deletePostComment(input: ObjectIdDto!): Boolean!
 }
 
 input RegisterUserInput {
