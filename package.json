@@ -17,7 +17,10 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "docker:start:seeder": "docker compose -f docker-compose.seeder.yml up -d && docker exec -it blog-api-seeder-container sh",
+    "docker:stop:seeder": "docker compose -f docker-compose.seeder.yml down",
+    "seeder:create:admin": "nest start --entryFile ./seeds/create-admin.seed.js"
   },
   "dependencies": {
     "@apollo/server": "^4.10.4",

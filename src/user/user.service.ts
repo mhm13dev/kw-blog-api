@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ObjectId } from 'mongodb';
-import { User } from './entities';
+import { User, UserRole } from './entities';
 
 @Injectable()
 export class UserService {
@@ -26,5 +26,13 @@ export class UserService {
     return this.userRepository.findOneBy({
       _id: new ObjectId(id),
     });
+  }
+
+  async doesAdminExist(): Promise<boolean> {
+    const admin = await this.userRepository.findOneBy({
+      role: UserRole.admin,
+    });
+
+    return !!admin;
   }
 }
