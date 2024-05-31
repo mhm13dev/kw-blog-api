@@ -65,6 +65,7 @@ type Mutation {
   refreshTokens: RefreshTokensResponse!
   logout: Boolean!
   createPost(createBlogPostInput: CreateBlogPostInput!): BlogPost!
+  updatePost(updateBlogPostInput: UpdateBlogPostInput!): BlogPost!
 }
 
 input RegisterUserInput {
@@ -81,4 +82,10 @@ input LoginUserInput {
 input CreateBlogPostInput {
   title: String!
   content: String!
+}
+
+input UpdateBlogPostInput {
+  title: String
+  content: String
+  _id: String!
 }

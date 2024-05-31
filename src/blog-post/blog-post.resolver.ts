@@ -12,7 +12,11 @@ import { CurrentUserPayload } from 'src/auth/decorators';
 import { TokenPayload } from 'src/auth/types/jwt.types';
 import { UserService } from 'src/user/user.service';
 import { User } from 'src/user/entities';
-import { CreateBlogPostInput, GetAllBlogPostsInput } from './dto';
+import {
+  CreateBlogPostInput,
+  GetAllBlogPostsInput,
+  UpdateBlogPostInput,
+} from './dto';
 import { BlogPost } from './entities';
 import { BlogPostService } from './blog-post.service';
 
@@ -61,5 +65,19 @@ export class BlogPostResolver {
   @ResolveField('author', () => User)
   getAuthor(@Parent() post: BlogPost): Promise<User> {
     return this.userService.findOneById(post.author_id.toHexString());
+  }
+
+  @Mutation(() => BlogPost, {
+    name: 'updatePost',
+  })
+  @UseGuards(GqlAccessTokenGuard)
+  updateBlogPost(
+    @CurrentUserPayload() currentUserPayload: TokenPayload,
+    @Args('updateBlogPostInput') updateBlogPostInput: UpdateBlogPostInput,
+  ): Promise<BlogPost> {
+    return this.blogPostService.updateBlogPost(
+      currentUserPayload,
+      updateBlogPostInput,
+    );
   }
 }
