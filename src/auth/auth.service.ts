@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { User } from 'src/user/user.entity';
 import { UserService } from 'src/user/user.service';
-import { LoginUserInput, RegisterUserInput } from './dto';
+import { LoginUserInput, LoginUserResponse, RegisterUserInput } from './dto';
 
 @Injectable()
 export class AuthService {
@@ -30,7 +30,7 @@ export class AuthService {
     });
   }
 
-  async loginUser(loginUserInput: LoginUserInput): Promise<User> {
+  async loginUser(loginUserInput: LoginUserInput): Promise<LoginUserResponse> {
     const user = await this.userService.findOneByEmail(loginUserInput.email);
 
     if (!user) {
@@ -41,6 +41,9 @@ export class AuthService {
       throw new BadRequestException('Invalid credentials');
     }
 
-    return user;
+    return new LoginUserResponse({
+      user,
+      token: 'jwt token',
+    });
   }
 }
