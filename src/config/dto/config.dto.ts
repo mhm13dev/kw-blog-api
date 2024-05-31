@@ -1,6 +1,9 @@
 import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { NodeEnv } from '../types/common.enum';
 
+/**
+ * This DTO class is used to validate the environment variables. If the environment variables are not valid, the application will not start.
+ */
 export class ConfigDto {
   // Core
   @IsNotEmpty()

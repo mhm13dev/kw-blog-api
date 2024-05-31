@@ -3,6 +3,9 @@ import { PostCommentSubscriber } from 'src/post-comment/subscribers';
 import { IConfig } from '../types/config.interface';
 import { NodeEnv } from '../types/common.enum';
 
+/**
+ * This is a custom configuration function that returns the configuration object available via the `ConfigService`.
+ */
 export function getConfig(): IConfig {
   return {
     core: {

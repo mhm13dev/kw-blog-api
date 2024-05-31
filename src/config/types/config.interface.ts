@@ -1,6 +1,9 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { NodeEnv } from './common.enum';
 
+/**
+ * This interface defines the configuration object available via the `ConfigService`.
+ */
 export interface IConfig {
   core: {
     NODE_ENV: NodeEnv;
