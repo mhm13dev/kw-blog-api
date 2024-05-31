@@ -3,11 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ObjectId } from 'mongodb';
 import { TokenPayload } from 'src/auth/types/jwt.types';
-import {
-  CreateBlogPostInput,
-  GetAllBlogPostsInput,
-  UpdateBlogPostInput,
-} from './dto';
+import { PaginationInput } from 'src/common/dto';
+import { CreateBlogPostInput, UpdateBlogPostInput } from './dto';
 import { BlogPost } from './entities';
 
 @Injectable()
@@ -33,7 +30,7 @@ export class BlogPostService {
     limit,
     offset,
     sort,
-  }: GetAllBlogPostsInput): Promise<BlogPost[]> {
+  }: PaginationInput): Promise<BlogPost[]> {
     return this.blogPostRepository.find({
       order: {
         createdAt: sort,

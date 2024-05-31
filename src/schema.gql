@@ -57,11 +57,12 @@ type PostComment {
 
 type Query {
   me: User!
-  posts(input: GetAllBlogPostsInput): [BlogPost!]!
+  posts(input: PaginationInput): [BlogPost!]!
   post(input: ObjectIdDto!): BlogPost!
+  comments(input: GetPostCommentsInput!): [PostComment!]!
 }
 
-input GetAllBlogPostsInput {
+input PaginationInput {
   limit: Int = 10
   offset: Int = 0
   sort: SortOrder = DESC
@@ -74,6 +75,13 @@ enum SortOrder {
 
 input ObjectIdDto {
   _id: String!
+}
+
+input GetPostCommentsInput {
+  limit: Int = 10
+  offset: Int = 0
+  sort: SortOrder = DESC
+  post_id: String!
 }
 
 type Mutation {

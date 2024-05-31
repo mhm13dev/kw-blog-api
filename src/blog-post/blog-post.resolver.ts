@@ -12,13 +12,9 @@ import { CurrentUserPayload } from 'src/auth/decorators';
 import { TokenPayload } from 'src/auth/types/jwt.types';
 import { UserService } from 'src/user/user.service';
 import { User } from 'src/user/entities';
-import { ObjectIdDto } from 'src/common/dto';
+import { ObjectIdDto, PaginationInput } from 'src/common/dto';
 import { Input } from 'src/common/graphql/args';
-import {
-  CreateBlogPostInput,
-  GetAllBlogPostsInput,
-  UpdateBlogPostInput,
-} from './dto';
+import { CreateBlogPostInput, UpdateBlogPostInput } from './dto';
 import { BlogPost } from './entities';
 import { BlogPostService } from './blog-post.service';
 
@@ -45,7 +41,7 @@ export class BlogPostResolver {
   })
   getAllBlogPosts(
     @Args('input', { nullable: true })
-    input: GetAllBlogPostsInput,
+    input: PaginationInput,
   ): Promise<BlogPost[]> {
     return this.blogPostService.getAllBlogPosts(input);
   }

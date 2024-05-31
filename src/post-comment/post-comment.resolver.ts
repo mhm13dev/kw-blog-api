@@ -1,4 +1,10 @@
-import { Mutation, Parent, ResolveField, Resolver } from '@nestjs/graphql';
+import {
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { Input } from 'src/common/graphql/args';
 import { GqlAccessTokenGuard } from 'src/auth/guards';
@@ -8,7 +14,7 @@ import { User } from 'src/user/entities';
 import { UserService } from 'src/user/user.service';
 import { BlogPostService } from 'src/blog-post/blog-post.service';
 import { BlogPost } from 'src/blog-post/entities';
-import { CreatePostCommentInput } from './dto';
+import { CreatePostCommentInput, GetPostCommentsInput } from './dto';
 import { PostComment } from './entities';
 import { PostCommentService } from './post-comment.service';
 
@@ -27,6 +33,15 @@ export class PostCommentResolver {
     @Input() input: CreatePostCommentInput,
   ): Promise<PostComment> {
     return this.postCommentService.createPostComment(currentUserPayload, input);
+  }
+
+  @Query(() => [PostComment], {
+    name: 'comments',
+  })
+  getPostComments(
+    @Input() input: GetPostCommentsInput,
+  ): Promise<PostComment[]> {
+    return this.postCommentService.getPostComments(input);
   }
 
   @ResolveField('author', () => User)

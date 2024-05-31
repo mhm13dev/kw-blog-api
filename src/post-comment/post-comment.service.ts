@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { ObjectId } from 'mongodb';
 import { TokenPayload } from 'src/auth/types/jwt.types';
 import { BlogPostService } from 'src/blog-post/blog-post.service';
-import { CreatePostCommentInput } from './dto';
+import { CreatePostCommentInput, GetPostCommentsInput } from './dto';
 import { PostComment } from './entities';
 
 @Injectable()
@@ -51,6 +51,19 @@ export class PostCommentService {
     }
 
     return this.postCommentRepository.save(postComment);
+  }
+
+  getPostComments(input: GetPostCommentsInput): Promise<PostComment[]> {
+    return this.postCommentRepository.find({
+      where: {
+        post_id: input.post_id,
+      },
+      take: input.limit,
+      skip: input.offset,
+      order: {
+        createdAt: input.sort,
+      },
+    });
   }
 
   findOneById(id: string): Promise<PostComment> {
