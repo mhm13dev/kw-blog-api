@@ -6,17 +6,27 @@ import {
 import { ObjectId } from 'mongodb';
 import { PostComment } from '../entities';
 
+/**
+ * Subscribes to `PostComment` entity events.
+ */
 @EventSubscriber()
 export class PostCommentSubscriber
   implements EntitySubscriberInterface<PostComment>
 {
   /**
-   * Indicates that this subscriber only listen to PostComment events.
+   * Indicates that this subscriber only listen to `PostComment` events.
    */
   listenTo() {
     return PostComment;
   }
 
+  /**
+   * This method is called before the `PostComment` entity is removed.
+   *
+   * We are using `manager.deleteMany()` method which will delete all `PostComment` nested under the `PostComment being deleted` without triggering the `PostCommentSubscriber` repeatedly.
+   *
+   * To find the nested comments, we are using a recursive function that finds all the children of the deleting `PostComment` and then deletes them in one DB query.
+   */
   async beforeRemove(event: RemoveEvent<PostComment>) {
     if (!event.entity) {
       return;

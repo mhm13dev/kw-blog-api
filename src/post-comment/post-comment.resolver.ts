@@ -19,6 +19,11 @@ import { CreatePostCommentInput, GetPostCommentsInput } from './dto';
 import { PostComment } from './entities';
 import { PostCommentService } from './post-comment.service';
 
+/**
+ * Resolver for `PostComment` entity.
+ *
+ * This resolver is responsible for handling all the queries and mutations related to the `PostComment` entity.
+ */
 @Resolver(() => PostComment)
 export class PostCommentResolver {
   constructor(
@@ -27,6 +32,12 @@ export class PostCommentResolver {
     private readonly blogPostService: BlogPostService,
   ) {}
 
+  /**
+   * Mutation to create a new `PostComment`.
+   * @param currentUserPayload - Logged in `User` payload
+   * @param input - Input data to create a new `PostComment`
+   * @returns Created `PostComment` object from the database
+   */
   @Mutation(() => PostComment)
   @UseGuards(GqlAccessTokenGuard)
   createPostComment(
@@ -36,6 +47,11 @@ export class PostCommentResolver {
     return this.postCommentService.createPostComment(currentUserPayload, input);
   }
 
+  /**
+   * Query to get all `PostComment` for a `BlogPost` from the database with pagination.
+   * @param input - Pagination options
+   * @returns Array of `PostComment` objects
+   */
   @Query(() => [PostComment], {
     name: 'comments',
   })
@@ -45,6 +61,12 @@ export class PostCommentResolver {
     return this.postCommentService.getPostComments(input);
   }
 
+  /**
+   * Mutation to delete a `PostComment`.
+   * @param currentUserPayload - Logged in `User` payload
+   * @param input - ID of the `PostComment`
+   * @returns `true` if the `PostComment` is deleted successfully
+   */
   @Mutation(() => Boolean)
   @UseGuards(GqlAccessTokenGuard)
   deletePostComment(
@@ -57,6 +79,12 @@ export class PostCommentResolver {
     );
   }
 
+  /**
+   * FieldResolver to get the `author` of the `PostComment`.
+   * @param postComment - Parent `PostComment` object
+   * @returns `User` object for the `author` of the `PostComment`
+   * @throws `NotFoundException` If the `User / author` is not found
+   */
   @ResolveField('author', () => User)
   async author(@Parent() postComment: PostComment): Promise<User> {
     const author = await this.userService.findOneById(
@@ -68,6 +96,12 @@ export class PostCommentResolver {
     return author;
   }
 
+  /**
+   * FieldResolver to get the `post` to which the `PostComment` belongs.
+   * @param postComment - Parent `PostComment` object
+   * @returns `BlogPost` object to which the `PostComment` belongs
+   * @throws `NotFoundException` If the `BlogPost` is not found
+   */
   @ResolveField('post', () => BlogPost)
   async post(@Parent() postComment: PostComment): Promise<BlogPost> {
     const post = await this.blogPostService.findOneById(
@@ -79,6 +113,13 @@ export class PostCommentResolver {
     return post;
   }
 
+  /**
+   * FieldResolver to get the parent `PostComment` to which the `postComment` is a reply.
+   * @param postComment - Parent (reply) `postComment` object
+   * @returns Parent `PostComment` object to which the `postComment` is a reply.
+   *
+   * Or `null` if the `postComment` is not a reply to any other `PostComment` i.e. it is a top-level comment.
+   */
   @ResolveField('reply_to_comment', () => PostComment, { nullable: true })
   async replyToComment(
     @Parent() postComment: PostComment,

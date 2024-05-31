@@ -12,6 +12,9 @@ import { BlogPostService } from 'src/blog-post/blog-post.service';
 import { CreatePostCommentInput, GetPostCommentsInput } from './dto';
 import { PostComment } from './entities';
 
+/**
+ * Service for operations related to `PostComment` entity.
+ */
 @Injectable()
 export class PostCommentService {
   constructor(
@@ -20,6 +23,18 @@ export class PostCommentService {
     private readonly blogPostService: BlogPostService,
   ) {}
 
+  /**
+   * Creates a new `PostComment` and saves it to the database.
+   *
+   * If the `reply_to_comment_id` is provided, then the comment will be a reply (nested comment) to the comment with the provided `reply_to_comment_id`.
+   * Otherwise, the comment will be a top-level comment on the post with the provided `post_id`.
+   *
+   * @param currentUserPayload - Logged in `User` payload
+   * @param input - Input data to create a new `PostComment`
+   * @returns Created `PostComment` object from the database
+   * @throws `BadRequestException` if the `reply_to_comment_id` or `post_id` is not provided
+   * @throws `NotFoundException` if the the entities belonging to `reply_to_comment_id` or `post_id` is not found
+   */
   async createPostComment(
     currentUserPayload: TokenPayload,
     input: CreatePostCommentInput,
@@ -35,7 +50,7 @@ export class PostCommentService {
         _id: input.reply_to_comment_id,
       });
       if (!replyToComment) {
-        throw new BadRequestException('Comment not found');
+        throw new NotFoundException('Comment not found');
       }
       postComment.reply_to_comment_id = input.reply_to_comment_id;
       postComment.post_id = replyToComment.post_id;
@@ -50,7 +65,7 @@ export class PostCommentService {
         input.post_id.toHexString(),
       );
       if (!post) {
-        throw new BadRequestException('Post not found');
+        throw new NotFoundException('Post not found');
       }
       postComment.post_id = input.post_id;
     }
@@ -58,6 +73,11 @@ export class PostCommentService {
     return this.postCommentRepository.save(postComment);
   }
 
+  /**
+   * Get all `PostComment` for a post with pagination.
+   * @param input - Pagination options
+   * @returns Array of `PostComment` objects
+   */
   getPostComments(input: GetPostCommentsInput): Promise<PostComment[]> {
     return this.postCommentRepository.find({
       where: {
@@ -71,6 +91,20 @@ export class PostCommentService {
     });
   }
 
+  /**
+   * Deletes a `PostComment` from the database.
+   *
+   * Only the author of the `PostComment` is allowed to delete it.
+   *
+   * If the deleting `PostComment` has any nested comments, then all the nested comments will be deleted as well by the `PostCommentSubscriber`.
+   *
+   * @param currentUserPayload - Logged in `User` payload
+   * @param commentId - ID of the `PostComment`
+   * @returns `true` if the `PostComment` is deleted successfully
+   * @throws `NotFoundException` if the `PostComment` is not found
+   * @throws `ForbiddenException` if the `User` is not allowed to delete the `PostComment`.
+   * i.e. the `User` is not the author of the `PostComment`
+   */
   async deletePostComment(
     currentUserPayload: TokenPayload,
     commentId: ObjectId,
@@ -84,11 +118,15 @@ export class PostCommentService {
     if (!postComment.author_id.equals(new ObjectId(currentUserPayload.sub))) {
       throw new ForbiddenException('You are not the author of this comment');
     }
-    // INFO: all the nested comments will be removed by the PostCommentSubscriber
     await this.postCommentRepository.remove(postComment);
     return true;
   }
 
+  /**
+   * Get a single `PostComment` by ID.
+   * @param id - ID of the `PostComment`
+   * @returns `PostComment` if found, `null` otherwise
+   */
   findOneById(id: string): Promise<PostComment | null> {
     return this.postCommentRepository.findOneBy({
       _id: new ObjectId(id),
