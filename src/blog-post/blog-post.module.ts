@@ -5,6 +5,7 @@ import { ElasticsearchModule } from 'src/elasticsearch/elasticsearch.module';
 import { BlogPost } from './entities';
 import { BlogPostService } from './blog-post.service';
 import { BlogPostResolver } from './blog-post.resolver';
+import { BlogPostSubscriber } from './blog-post.subscriber';
 
 @Module({
   imports: [
@@ -12,7 +13,7 @@ import { BlogPostResolver } from './blog-post.resolver';
     UserModule,
     ElasticsearchModule,
   ],
-  providers: [BlogPostResolver, BlogPostService],
+  providers: [BlogPostResolver, BlogPostService, BlogPostSubscriber],
   exports: [BlogPostService],
 })
 export class BlogPostModule implements OnModuleInit {

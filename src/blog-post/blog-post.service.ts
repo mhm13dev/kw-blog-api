@@ -133,7 +133,7 @@ export class BlogPostService {
   }
 
   /**
-   * Delete a `BlogPost` from Database and Elasticsearch
+   * Delete a `BlogPost` from Database and Elasticsearch (via BlogPostSubscriber)
    *
    * Only the `author` of the `BlogPost` is allowed to delete it.
    *
@@ -159,7 +159,6 @@ export class BlogPostService {
       throw new ForbiddenException('You are not the author of this post');
     }
     await this.blogPostRepository.remove(blogPost);
-    this.removeBlogPostFromIndex(id);
     return true;
   }
 
@@ -218,17 +217,6 @@ export class BlogPostService {
         },
       },
       doc_as_upsert: true,
-    });
-  }
-
-  /**
-   * Remove `BlogPost` from Elasticsearch
-   * @param id - ID of the `BlogPost`
-   */
-  removeBlogPostFromIndex(id: string): void {
-    this.elasticsearchService.delete({
-      index: ES_BLOG_POSTS_INDEX,
-      id,
     });
   }
 }
