@@ -16,6 +16,7 @@ export function getConfig(): IConfig {
         port: parseInt(process.env.MONGO_PORT, 10),
         database: process.env.MONGO_DATABASE,
         authSource: 'admin',
+        autoLoadEntities: true,
       },
     },
   };

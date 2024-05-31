@@ -1,21 +1,28 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { User } from './models/user.model';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { ObjectId } from 'mongodb';
 import { CreateUserInput } from './dto/create-user.input';
+import { User } from './user.entity';
 
 @Injectable()
 export class UserService {
-  private users: User[] = [];
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+  ) {}
 
-  create(createUserInput: CreateUserInput) {
-    const user = new User();
-    user.id = this.users.length.toString();
-    user.name = createUserInput.name;
-    this.users.push(user);
-    return user;
+  async create(createUserInput: CreateUserInput) {
+    const user = this.userRepository.create({
+      name: createUserInput.name,
+    });
+    return this.userRepository.save(user);
   }
 
-  findOne(id: string): User {
-    const user = this.users.find((u) => u.id === id);
+  async findOne(_id: string) {
+    const user = await this.userRepository.findOneBy({
+      _id: new ObjectId(_id),
+    });
     if (!user) {
       throw new NotFoundException('User not found');
     }
