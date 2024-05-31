@@ -1,7 +1,11 @@
+import { join } from 'path';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { ConfigModule } from './config/config.module';
 import { ConfigService } from './config/config.service';
+import { UserModule } from './user/user.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -14,6 +18,11 @@ import { AppService } from './app.service';
       },
       inject: [ConfigService],
     }),
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+    }),
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
