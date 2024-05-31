@@ -13,6 +13,7 @@ import { TokenPayload } from 'src/auth/types/jwt.types';
 import { UserService } from 'src/user/user.service';
 import { User } from 'src/user/entities';
 import { ObjectIdDto } from 'src/common/dto';
+import { Input } from 'src/common/graphql/args';
 import {
   CreateBlogPostInput,
   GetAllBlogPostsInput,
@@ -34,29 +35,26 @@ export class BlogPostResolver {
   @UseGuards(GqlAccessTokenGuard)
   createBlogPost(
     @CurrentUserPayload() currentUserPayload: TokenPayload,
-    @Args('createBlogPostInput') createBlogPostInput: CreateBlogPostInput,
+    @Input() input: CreateBlogPostInput,
   ): Promise<BlogPost> {
-    return this.blogPostService.createBlogPost(
-      currentUserPayload,
-      createBlogPostInput,
-    );
+    return this.blogPostService.createBlogPost(currentUserPayload, input);
   }
 
   @Query(() => [BlogPost], {
     name: 'posts',
   })
   getAllBlogPosts(
-    @Args('getAllBlogPostsInput', { nullable: true })
-    getAllBlogPostsInput: GetAllBlogPostsInput,
+    @Args('input', { nullable: true })
+    input: GetAllBlogPostsInput,
   ): Promise<BlogPost[]> {
-    return this.blogPostService.getAllBlogPosts(getAllBlogPostsInput);
+    return this.blogPostService.getAllBlogPosts(input);
   }
 
   @Query(() => BlogPost, {
     name: 'post',
   })
-  async getOneBlogPost(@Args('_id') _id: string): Promise<BlogPost> {
-    const post = await this.blogPostService.findOneById(_id);
+  async getOneBlogPost(@Input() input: ObjectIdDto): Promise<BlogPost> {
+    const post = await this.blogPostService.findOneById(input._id);
     if (!post) {
       throw new NotFoundException('Post not found');
     }
@@ -74,12 +72,9 @@ export class BlogPostResolver {
   @UseGuards(GqlAccessTokenGuard)
   updateBlogPost(
     @CurrentUserPayload() currentUserPayload: TokenPayload,
-    @Args('updateBlogPostInput') updateBlogPostInput: UpdateBlogPostInput,
+    @Input() input: UpdateBlogPostInput,
   ): Promise<BlogPost> {
-    return this.blogPostService.updateBlogPost(
-      currentUserPayload,
-      updateBlogPostInput,
-    );
+    return this.blogPostService.updateBlogPost(currentUserPayload, input);
   }
 
   @Mutation(() => Boolean, {
@@ -88,12 +83,9 @@ export class BlogPostResolver {
   @UseGuards(GqlAccessTokenGuard)
   async deleteBlogPost(
     @CurrentUserPayload() currentUserPayload: TokenPayload,
-    @Args('deleteBlogPostInput') deleteBlogPostInput: ObjectIdDto,
+    @Input() input: ObjectIdDto,
   ): Promise<boolean> {
-    await this.blogPostService.deleteBlogPost(
-      currentUserPayload,
-      deleteBlogPostInput._id,
-    );
+    await this.blogPostService.deleteBlogPost(currentUserPayload, input._id);
     return true;
   }
 }

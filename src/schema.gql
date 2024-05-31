@@ -44,8 +44,8 @@ type BlogPost {
 
 type Query {
   me: User!
-  posts(getAllBlogPostsInput: GetAllBlogPostsInput): [BlogPost!]!
-  post(_id: String!): BlogPost!
+  posts(input: GetAllBlogPostsInput): [BlogPost!]!
+  post(input: ObjectIdDto!): BlogPost!
 }
 
 input GetAllBlogPostsInput {
@@ -59,14 +59,18 @@ enum SortOrder {
   DESC
 }
 
+input ObjectIdDto {
+  _id: String!
+}
+
 type Mutation {
-  registerUser(registerUserInput: RegisterUserInput!): User!
-  loginUser(loginUserInput: LoginUserInput!): LoginUserResponse!
+  registerUser(input: RegisterUserInput!): User!
+  loginUser(input: LoginUserInput!): LoginUserResponse!
   refreshTokens: RefreshTokensResponse!
   logout: Boolean!
-  createPost(createBlogPostInput: CreateBlogPostInput!): BlogPost!
-  updatePost(updateBlogPostInput: UpdateBlogPostInput!): BlogPost!
-  deletePost(deleteBlogPostInput: ObjectIdDto!): Boolean!
+  createPost(input: CreateBlogPostInput!): BlogPost!
+  updatePost(input: UpdateBlogPostInput!): BlogPost!
+  deletePost(input: ObjectIdDto!): Boolean!
 }
 
 input RegisterUserInput {
@@ -88,9 +92,5 @@ input CreateBlogPostInput {
 input UpdateBlogPostInput {
   title: String
   content: String
-  _id: String!
-}
-
-input ObjectIdDto {
   _id: String!
 }

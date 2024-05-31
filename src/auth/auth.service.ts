@@ -31,36 +31,36 @@ export class AuthService {
     private readonly userSessionRepository: Repository<UserSession>,
   ) {}
 
-  async registerUser(registerUserInput: RegisterUserInput): Promise<User> {
+  async registerUser(input: RegisterUserInput): Promise<User> {
     // Check if passwords match
-    if (registerUserInput.password !== registerUserInput.confirm_password) {
+    if (input.password !== input.confirm_password) {
       throw new BadRequestException('Passwords do not match');
     }
 
     // Check if user already exist
-    if (!!(await this.userService.findOneByEmail(registerUserInput.email))) {
+    if (!!(await this.userService.findOneByEmail(input.email))) {
       throw new ForbiddenException('Email already exist');
     }
 
     // Create User
     return this.userService.create({
-      email: registerUserInput.email,
-      password: registerUserInput.password,
-      name: registerUserInput.email.split('@')[0],
+      email: input.email,
+      password: input.password,
+      name: input.email.split('@')[0],
       role: UserRole.user,
     });
   }
 
-  async loginUser(loginUserInput: LoginUserInput): Promise<LoginUserResponse> {
+  async loginUser(input: LoginUserInput): Promise<LoginUserResponse> {
     // Check if user exist
-    const user = await this.userService.findOneByEmail(loginUserInput.email);
+    const user = await this.userService.findOneByEmail(input.email);
 
     if (!user) {
       throw new BadRequestException('Invalid credentials');
     }
 
     // Check if passwords match
-    if (!(await user.comparePassword(loginUserInput.password))) {
+    if (!(await user.comparePassword(input.password))) {
       throw new BadRequestException('Invalid credentials');
     }
 

@@ -19,12 +19,12 @@ export class BlogPostService {
 
   createBlogPost(
     currentUserPayload: TokenPayload,
-    createBlogPostInput: CreateBlogPostInput,
+    input: CreateBlogPostInput,
   ): Promise<BlogPost> {
     const blogPost = this.blogPostRepository.create({
       author_id: new ObjectId(currentUserPayload.sub),
-      title: createBlogPostInput.title,
-      content: createBlogPostInput.content,
+      title: input.title,
+      content: input.content,
     });
     return this.blogPostRepository.save(blogPost);
   }
@@ -51,10 +51,10 @@ export class BlogPostService {
 
   async updateBlogPost(
     currentUserPayload: TokenPayload,
-    updateBlogPostInput: UpdateBlogPostInput,
+    input: UpdateBlogPostInput,
   ): Promise<BlogPost> {
     const blogPost = await this.blogPostRepository.findOneBy({
-      _id: new ObjectId(updateBlogPostInput._id),
+      _id: new ObjectId(input._id),
       author_id: new ObjectId(currentUserPayload.sub),
     });
 
@@ -63,8 +63,8 @@ export class BlogPostService {
     }
 
     const updatedBlogPost = this.blogPostRepository.merge(blogPost, {
-      title: updateBlogPostInput.title,
-      content: updateBlogPostInput.content,
+      title: input.title,
+      content: input.content,
     });
 
     return this.blogPostRepository.save(updatedBlogPost);
