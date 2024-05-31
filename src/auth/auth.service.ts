@@ -11,7 +11,7 @@ import { ObjectId } from 'mongodb';
 import { instanceToPlain } from 'class-transformer';
 import { User, UserRole } from 'src/user/entities';
 import { UserService } from 'src/user/user.service';
-import { ConfigService } from 'src/config/config.service';
+import { AppConfigService } from 'src/config/config.service';
 import { TokenPayload, TokensPair } from './types/jwt.types';
 import { UserSession } from './entities';
 import {
@@ -26,7 +26,7 @@ export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
-    private readonly configService: ConfigService,
+    private readonly appConfigService: AppConfigService,
     @InjectRepository(UserSession)
     private readonly userSessionRepository: Repository<UserSession>,
   ) {}
@@ -131,12 +131,12 @@ export class AuthService {
   private async generateTokensPair(payload: TokenPayload): Promise<TokensPair> {
     return new TokensPair({
       access_token: await this.jwtService.signAsync(instanceToPlain(payload), {
-        secret: this.configService.auth.ACCESS_TOKEN_SECRET,
-        expiresIn: this.configService.auth.ACCESS_TOKEN_EXPIRATION,
+        secret: this.appConfigService.auth.ACCESS_TOKEN_SECRET,
+        expiresIn: this.appConfigService.auth.ACCESS_TOKEN_EXPIRATION,
       }),
       refresh_token: await this.jwtService.signAsync(instanceToPlain(payload), {
-        secret: this.configService.auth.REFRESH_TOKEN_SECRET,
-        expiresIn: this.configService.auth.REFRESH_TOKEN_EXPIRATION,
+        secret: this.appConfigService.auth.REFRESH_TOKEN_SECRET,
+        expiresIn: this.appConfigService.auth.REFRESH_TOKEN_EXPIRATION,
       }),
     });
   }

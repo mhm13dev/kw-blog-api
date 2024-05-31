@@ -3,8 +3,8 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { ConfigModule } from './config/config.module';
-import { ConfigService } from './config/config.service';
+import { AppConfigModule } from './config/config.module';
+import { AppConfigService } from './config/config.service';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { BlogPostModule } from './blog-post/blog-post.module';
@@ -14,12 +14,12 @@ import { AppService } from './app.service';
 
 @Module({
   imports: [
-    ConfigModule.register(),
+    AppConfigModule.register(),
     TypeOrmModule.forRootAsync({
-      useFactory: (configService: ConfigService) => {
-        return configService.database.MONGODB;
+      useFactory: (appConfigService: AppConfigService) => {
+        return appConfigService.database.MONGODB;
       },
-      inject: [ConfigService],
+      inject: [AppConfigService],
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,

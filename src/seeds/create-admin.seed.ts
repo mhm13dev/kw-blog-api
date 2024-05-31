@@ -1,18 +1,15 @@
 import { NestFactory } from '@nestjs/core';
 import { Injectable, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule } from 'src/config/config.module';
-import { ConfigService } from 'src/config/config.service';
+import { AppConfigModule } from 'src/config/config.module';
+import { AppConfigService } from 'src/config/config.service';
 import { UserModule } from 'src/user/user.module';
 import { UserService } from 'src/user/user.service';
 import { UserRole } from 'src/user/entities';
 
 @Injectable()
 class SeederService {
-  constructor(
-    private readonly configService: ConfigService,
-    private readonly userService: UserService,
-  ) {}
+  constructor(private readonly userService: UserService) {}
 
   async createAdmin() {
     console.log('Seed: Creating admin in database...');
@@ -36,13 +33,12 @@ class SeederService {
 
 @Module({
   imports: [
-    ConfigModule.register(),
+    AppConfigModule.register(),
     TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => {
-        return configService.database.MONGODB;
+      useFactory: (appConfigService: AppConfigService) => {
+        return appConfigService.database.MONGODB;
       },
-      inject: [ConfigService],
+      inject: [AppConfigService],
     }),
     UserModule,
   ],
