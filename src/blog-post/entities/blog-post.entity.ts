@@ -11,6 +11,9 @@ import { Transform } from 'class-transformer';
 import { MaxLength } from 'class-validator';
 import { User } from 'src/user/entities';
 
+/**
+ * `BlogPost` entity for the Database and GraphQL Schema
+ */
 @ObjectType()
 @Entity({
   name: 'blog_posts',
