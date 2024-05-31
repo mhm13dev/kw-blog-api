@@ -1,6 +1,6 @@
-# Blog App Backend in Nest.js, GraphQL and MongoDB with TypeORM
+# Blog App Backend in Nest.js, GraphQL and Postgres with TypeORM
 
-This is a blog app backend built with Nest.js, GraphQL and MongoDB with TypeORM.
+This is a blog app backend built with Nest.js, GraphQL and Postgres with TypeORM.
 
 ## Prerequisites
 
@@ -29,7 +29,7 @@ To create a user with the role of `admin`, you need to run seed script.
 cp .env.migrations.example .env.migrations
 ```
 
-💥 For running the migrations and seed scripts, you need to have a MongoDB instance running. You can use the following command to run a MongoDB instance using Docker Compose.
+💥 For running the migrations and seed scripts, you need to have a Postgres instance running. You can use the following command to run a Postgres instance using Docker Compose.
 
 ```bash
 # Before starting the migration:
