@@ -7,9 +7,9 @@ import {
 } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { Input } from 'src/common/graphql/args';
-import { GqlAccessTokenGuard } from 'src/auth/guards';
-import { CurrentUserPayload } from 'src/auth/decorators';
-import { TokenPayload } from 'src/auth/types/jwt.types';
+import { GqlAccessTokenGuard } from 'src/user/guards';
+import { CurrentUserPayload } from 'src/user/decorators';
+import { TokenPayload } from 'src/user/types/jwt.types';
 import { User } from 'src/user/entities';
 import { UserService } from 'src/user/user.service';
 import { BlogPostService } from 'src/blog-post/blog-post.service';

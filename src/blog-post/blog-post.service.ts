@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { TokenPayload } from 'src/auth/types/jwt.types';
+import { TokenPayload } from 'src/user/types/jwt.types';
 import { PaginationInput } from 'src/common/dto';
 import { CreateBlogPostInput, UpdateBlogPostInput } from './dto';
 import { BlogPost } from './entities';

@@ -7,9 +7,9 @@ import {
   Parent,
 } from '@nestjs/graphql';
 import { NotFoundException, UseGuards } from '@nestjs/common';
-import { GqlAccessTokenGuard } from 'src/auth/guards';
-import { CurrentUserPayload } from 'src/auth/decorators';
-import { TokenPayload } from 'src/auth/types/jwt.types';
+import { GqlAccessTokenGuard } from 'src/user/guards';
+import { CurrentUserPayload } from 'src/user/decorators';
+import { TokenPayload } from 'src/user/types/jwt.types';
 import { UserService } from 'src/user/user.service';
 import { User } from 'src/user/entities';
 import { UUIDDTO, PaginationInput } from 'src/common/dto';
