@@ -17,23 +17,23 @@ export class ConfigDto {
   // Database
   @IsNotEmpty()
   @IsString()
-  MONGO_INITDB_ROOT_USERNAME: string;
+  POSTGRES_USER: string;
 
   @IsNotEmpty()
   @IsString()
-  MONGO_INITDB_ROOT_PASSWORD: string;
+  POSTGRES_PASSWORD: string;
 
   @IsNotEmpty()
   @IsString()
-  MONGO_HOST: string;
+  POSTGRES_DB: string;
+
+  @IsNotEmpty()
+  @IsString()
+  POSTGRES_HOST: string;
 
   @IsNotEmpty()
   @IsNumber()
-  MONGO_PORT: number;
-
-  @IsNotEmpty()
-  @IsString()
-  MONGO_DATABASE: string;
+  POSTGRES_PORT: number;
 
   // AUTH
   @IsNotEmpty()

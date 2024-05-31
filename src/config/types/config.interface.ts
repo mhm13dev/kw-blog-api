@@ -11,7 +11,7 @@ export interface IConfig {
   };
 
   database: {
-    MONGODB: TypeOrmModuleOptions;
+    POSTGRES: TypeOrmModuleOptions;
   };
 
   auth: {

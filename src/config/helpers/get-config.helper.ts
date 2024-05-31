@@ -13,14 +13,13 @@ export function getConfig(): IConfig {
       PORT: parseInt(process.env.PORT!, 10) || 5001,
     },
     database: {
-      MONGODB: {
-        type: 'mongodb',
-        username: process.env.MONGO_INITDB_ROOT_USERNAME,
-        password: process.env.MONGO_INITDB_ROOT_PASSWORD,
-        host: process.env.MONGO_HOST,
-        port: parseInt(process.env.MONGO_PORT!, 10),
-        database: process.env.MONGO_DATABASE,
-        authSource: 'admin',
+      POSTGRES: {
+        type: 'postgres',
+        username: process.env.POSTGRES_USER,
+        password: process.env.POSTGRES_PASSWORD,
+        database: process.env.POSTGRES_DB,
+        host: process.env.POSTGRES_HOST,
+        port: parseInt(process.env.POSTGRES_PORT!, 10),
         autoLoadEntities: true,
         synchronize: process.env.NODE_ENV !== 'production',
         subscribers: [BlogPostSubscriber, PostCommentSubscriber],

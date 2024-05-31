@@ -1,12 +1,12 @@
 services:
-  mongodb:
-    image: mongo
+  postgres:
+    image: postgres:16
     ports:
-      - 27017:27017
+      - 5432:5432
     env_file:
       - .env.migrations
     volumes:
-      - mongodb-data:/data/db
+      - postgres-data:/var/lib/postgresql/data
 
 volumes:
-  mongodb-data:
+  postgres-data:

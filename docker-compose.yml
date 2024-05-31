@@ -7,17 +7,18 @@ services:
     volumes:
       - .:/app
     depends_on:
-      - mongodb
+      - postgres
     command: sh -c "npm install && npm run start:dev"
-  mongodb:
-    image: mongo
+  postgres:
+    image: postgres:16
     ports:
-      - 27017:27017
+      - 5432:5432
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
-      - mongodb-data:/data/db
+      - postgres-data:/var/lib/postgresql/data
 
 volumes:
-  mongodb-data:
+  postgres-data:
