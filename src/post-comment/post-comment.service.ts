@@ -157,6 +157,7 @@ export class PostCommentService {
 
     const mappings: MappingTypeMapping = {
       properties: {
+        id: { type: 'keyword' },
         content: { type: 'text' },
         post_id: { type: 'keyword' },
         parent_comment_id: { type: 'keyword' },
@@ -195,6 +196,7 @@ export class PostCommentService {
       index: ES_POST_COMMENTS_INDEX,
       id: postComment.id,
       body: {
+        id: postComment.id,
         content: postComment.content,
         post_id: postComment.post_id,
         parent_comment_id: postComment.parent_comment_id,

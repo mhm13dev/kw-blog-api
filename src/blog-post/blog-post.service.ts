@@ -173,6 +173,7 @@ export class BlogPostService {
 
     const mappings: MappingTypeMapping = {
       properties: {
+        id: { type: 'keyword' },
         title: { type: 'text' },
         content: { type: 'text' },
         author: {
@@ -208,6 +209,7 @@ export class BlogPostService {
       index: ES_BLOG_POSTS_INDEX,
       id: blogPost.id,
       doc: {
+        id: blogPost.id,
         title: blogPost.title,
         content: blogPost.content,
         author: {
