@@ -11,8 +11,8 @@ import { instanceToPlain } from 'class-transformer';
 import { User } from 'src/user/entities';
 import { UserService } from 'src/user/user.service';
 import { ConfigService } from 'src/config/config.service';
-import { UserSession } from './entities/user-session.entity';
 import { TokenPayload, TokensPair } from './types/jwt.types';
+import { UserSession } from './entities';
 import { LoginUserInput, LoginUserResponse, RegisterUserInput } from './dto';
 
 @Injectable()
