@@ -10,6 +10,9 @@ import {
 import { ObjectId } from 'mongodb';
 import * as argon2 from 'argon2';
 
+/**
+ * `UserSession` entity for the Database
+ */
 @Entity({
   name: 'user_sessions',
 })
@@ -33,6 +36,11 @@ export class UserSession {
   })
   updatedAt: Date;
 
+  /**
+   * Hashes the `refresh_token` before inserting or updating the `UserSession`.
+   *
+   * Uses the {@link https://www.npmjs.com/package/argon2 | argon2} library to hash the `refresh_token`
+   */
   @BeforeInsert()
   @BeforeUpdate()
   async hashRefreshToken() {
