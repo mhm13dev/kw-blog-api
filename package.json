@@ -20,7 +20,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "docker:start:dev": "docker compose -f docker-compose.yml up -d",
     "docker:stop:dev": "docker compose -f docker-compose.yml down",
-    "docker:start:seeder": "docker compose -f docker-compose.seeder.yml up -d && docker exec -it blog-api-seeder-container sh",
+    "docker:start:seeder": "docker compose -f docker-compose.seeder.yml up -d",
     "docker:stop:seeder": "docker compose -f docker-compose.seeder.yml down",
     "seeder:create:admin": "nest start --entryFile ./seeds/create-admin.seed.js"
   },
@@ -38,7 +38,9 @@
     "argon2": "^0.40.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
+    "dotenv": "^16.4.5",
     "graphql": "^16.8.1",
+    "migrate-mongo": "^11.0.0",
     "mongodb": "^5.9.2",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",

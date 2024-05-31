@@ -1,21 +1,10 @@
 services:
-  blog-api:
-    image: node:20-alpine
-    container_name: blog-api-seeder-container
-    working_dir: /app
-    volumes:
-      - .:/app
-    depends_on:
-      - mongodb
-    command: sh -c "npm install && sh"
-    tty: true
   mongodb:
     image: mongo
     ports:
       - 27017:27017
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+    env_file:
+      - .env.migrate-mongo
     volumes:
       - mongodb-data:/data/db
 
