@@ -19,6 +19,6 @@ export class BlogPostModule implements OnModuleInit {
   constructor(private readonly blogPostService: BlogPostService) {}
 
   async onModuleInit(): Promise<void> {
-    await this.blogPostService.createBlogPostsIndexIfNotExists();
+    await this.blogPostService.createOrUpdateBlogPostsIndex();
   }
 }

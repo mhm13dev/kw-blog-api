@@ -4,6 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
+import { MappingTypeMapping } from '@elastic/elasticsearch/lib/api/types';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserService } from 'src/user/user.service';
@@ -163,30 +164,37 @@ export class BlogPostService {
   }
 
   /**
-   * Create the Elasticsearch index for `BlogPost` if it doesn't exist
+   * Create or Update the Elasticsearch index for `BlogPost`
    */
-  async createBlogPostsIndexIfNotExists(): Promise<void> {
+  async createOrUpdateBlogPostsIndex(): Promise<void> {
     const indexExists = await this.elasticsearchService.indices.exists({
       index: ES_BLOG_POSTS_INDEX,
     });
+
+    const mappings: MappingTypeMapping = {
+      properties: {
+        title: { type: 'text' },
+        content: { type: 'text' },
+        author: {
+          properties: {
+            id: { type: 'keyword' },
+            name: { type: 'text' },
+          },
+        },
+      },
+    };
 
     if (!indexExists) {
       await this.elasticsearchService.indices.create({
         index: ES_BLOG_POSTS_INDEX,
         body: {
-          mappings: {
-            properties: {
-              title: { type: 'text' },
-              content: { type: 'text' },
-              author: {
-                properties: {
-                  id: { type: 'keyword' },
-                  name: { type: 'text' },
-                },
-              },
-            },
-          },
+          mappings,
         },
+      });
+    } else {
+      await this.elasticsearchService.indices.putMapping({
+        index: ES_BLOG_POSTS_INDEX,
+        body: mappings,
       });
     }
   }
