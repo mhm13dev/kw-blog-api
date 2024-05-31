@@ -21,6 +21,15 @@ export function getConfig(): IConfig {
         autoLoadEntities: true,
         synchronize: false, // It's better to generate and run migrations when entities change
       },
+      ELASTIC_SEARCH: {
+        node: `http://${process.env.ELASTIC_SEARCH_HOST}:${process.env.ELASTIC_SEARCH_PORT}`,
+        auth: {
+          apiKey: {
+            id: process.env.ELASTIC_SEARCH_API_KEY_ID!,
+            api_key: process.env.ELASTIC_SEARCH_API_KEY!,
+          },
+        },
+      },
     },
     auth: {
       ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET!,

@@ -3,11 +3,14 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { UserService } from 'src/user/user.service';
 import { TokenPayload } from 'src/user/types/jwt.types';
 import { PaginationInput } from 'src/common/dto';
 import { CreateBlogPostInput, UpdateBlogPostInput } from './dto';
+import { ES_BLOG_POSTS_INDEX } from './constants';
 import { BlogPost } from './entities';
 
 /**
@@ -18,24 +21,69 @@ export class BlogPostService {
   constructor(
     @InjectRepository(BlogPost)
     private blogPostRepository: Repository<BlogPost>,
-  ) {}
+    private readonly userService: UserService,
+    private readonly elasticsearchService: ElasticsearchService,
+  ) {
+    this.createBlogPostsIndexIfNotExists();
+  }
 
   /**
-   * Creates a new `BlogPost`
+   * Create the Elasticsearch index for `BlogPost` if it doesn't exist
+   */
+  async createBlogPostsIndexIfNotExists(): Promise<void> {
+    const indexExists = await this.elasticsearchService.indices.exists({
+      index: ES_BLOG_POSTS_INDEX,
+    });
+
+    if (!indexExists) {
+      await this.elasticsearchService.indices.create({
+        index: ES_BLOG_POSTS_INDEX,
+        body: {
+          mappings: {
+            properties: {
+              title: { type: 'text' },
+              content: { type: 'text' },
+              author: {
+                properties: {
+                  id: { type: 'keyword' },
+                  name: { type: 'text' },
+                },
+              },
+            },
+          },
+        },
+      });
+    }
+  }
+
+  /**
+   * Creates a new `BlogPost` and Index it in Elasticsearch
    * @param currentUserPayload - Logged in `User` payload
    * @param input - Input data to create a new `BlogPost`
    * @returns Created `BlogPost` object from the database
+   * @throws `NotFoundException` If the `User / author` is not found
    */
-  createBlogPost(
+  async createBlogPost(
     currentUserPayload: TokenPayload,
     input: CreateBlogPostInput,
   ): Promise<BlogPost> {
+    const author = await this.userService.findOneById(currentUserPayload.sub);
+    if (!author) {
+      throw new NotFoundException('Author not found');
+    }
+
     const blogPost = this.blogPostRepository.create({
-      author_id: currentUserPayload.sub,
+      author,
       title: input.title,
       content: input.content,
     });
-    return this.blogPostRepository.save(blogPost);
+
+    const savedBlogPost = await this.blogPostRepository.save(blogPost);
+
+    // Index the blog post in Elasticsearch
+    await this.indexBlogPost(savedBlogPost);
+
+    return savedBlogPost;
   }
 
   /**
@@ -69,7 +117,7 @@ export class BlogPostService {
   }
 
   /**
-   * Update a `BlogPost`
+   * Update a `BlogPost` in Database and Elasticsearch
    *
    * Only the `author` of the `BlogPost` is allowed to update it.
    *
@@ -85,8 +133,11 @@ export class BlogPostService {
     currentUserPayload: TokenPayload,
     input: UpdateBlogPostInput,
   ): Promise<BlogPost> {
-    const blogPost = await this.blogPostRepository.findOneBy({
-      id: input.id,
+    const blogPost = await this.blogPostRepository.findOne({
+      where: {
+        id: input.id,
+      },
+      relations: ['author'],
     });
 
     if (!blogPost) {
@@ -102,11 +153,17 @@ export class BlogPostService {
       content: input.content,
     });
 
-    return this.blogPostRepository.save(updatedBlogPost);
+    const savedUpdatedBlogPost =
+      await this.blogPostRepository.save(updatedBlogPost);
+
+    // Index the updated BlogPost in Elasticsearch
+    this.indexBlogPost(savedUpdatedBlogPost);
+
+    return savedUpdatedBlogPost;
   }
 
   /**
-   * Delete a `BlogPost`
+   * Delete a `BlogPost` from Database and Elasticsearch
    *
    * Only the `author` of the `BlogPost` is allowed to delete it.
    *
@@ -132,6 +189,38 @@ export class BlogPostService {
       throw new ForbiddenException('You are not the author of this post');
     }
     await this.blogPostRepository.remove(blogPost);
+    this.removeBlogPostFromIndex(id);
     return true;
+  }
+
+  /**
+   * Index `BlogPost` in Elasticsearch
+   * @param blogPost - `BlogPost` object with populated `author`
+   */
+  indexBlogPost(blogPost: BlogPost): void {
+    this.elasticsearchService.update({
+      index: ES_BLOG_POSTS_INDEX,
+      id: blogPost.id,
+      doc: {
+        title: blogPost.title,
+        content: blogPost.content,
+        author: {
+          id: blogPost.author.id,
+          name: blogPost.author.name,
+        },
+      },
+      doc_as_upsert: true,
+    });
+  }
+
+  /**
+   * Remove `BlogPost` from Elasticsearch
+   * @param id - ID of the `BlogPost`
+   */
+  removeBlogPostFromIndex(id: string): void {
+    this.elasticsearchService.delete({
+      index: ES_BLOG_POSTS_INDEX,
+      id,
+    });
   }
 }

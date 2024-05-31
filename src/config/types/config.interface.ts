@@ -1,5 +1,6 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { NodeEnv } from './common.enum';
+import { ClientOptions } from '@elastic/elasticsearch';
 
 /**
  * This interface defines the configuration object available via the `ConfigService`.
@@ -12,6 +13,7 @@ export interface IConfig {
 
   database: {
     POSTGRES: TypeOrmModuleOptions;
+    ELASTIC_SEARCH: ClientOptions;
   };
 
   auth: {
