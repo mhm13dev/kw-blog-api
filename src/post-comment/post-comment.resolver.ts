@@ -87,9 +87,7 @@ export class PostCommentResolver {
    */
   @ResolveField('author', () => User)
   async author(@Parent() postComment: PostComment): Promise<User> {
-    const author = await this.userService.findOneById(
-      postComment.author_id.toHexString(),
-    );
+    const author = await this.userService.findOneById(postComment.author_id);
     if (!author) {
       throw new Error('Author not found');
     }
@@ -104,9 +102,7 @@ export class PostCommentResolver {
    */
   @ResolveField('post', () => BlogPost)
   async post(@Parent() postComment: PostComment): Promise<BlogPost> {
-    const post = await this.blogPostService.findOneById(
-      postComment.post_id.toHexString(),
-    );
+    const post = await this.blogPostService.findOneById(postComment.post_id);
     if (!post) {
       throw new Error('Post not found');
     }
@@ -120,15 +116,13 @@ export class PostCommentResolver {
    *
    * Or `null` if the `postComment` is not a reply to any other `PostComment` i.e. it is a top-level comment.
    */
-  @ResolveField('reply_to_comment', () => PostComment, { nullable: true })
-  async replyToComment(
+  @ResolveField('parent_comment', () => PostComment, { nullable: true })
+  async parentComment(
     @Parent() postComment: PostComment,
   ): Promise<PostComment | null> {
-    if (!postComment.reply_to_comment_id) {
+    if (!postComment.parent_comment_id) {
       return null;
     }
-    return this.postCommentService.findOneById(
-      postComment.reply_to_comment_id.toHexString(),
-    );
+    return this.postCommentService.findOneById(postComment.parent_comment_id);
   }
 }

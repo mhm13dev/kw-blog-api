@@ -110,7 +110,7 @@ export class BlogPostService {
    *
    * Only the `author` of the `BlogPost` is allowed to delete it.
    *
-   * All the associated `PostComment` with the `BlogPost` will be deleted by the `BlogPostSubscriber`.
+   * All the associated `PostComment` with the `BlogPost` will be deleted by onDelete: 'CASCADE'.
    *
    * @param currentUserPayload - Logged in `User` payload
    * @param id - ID of the `BlogPost`

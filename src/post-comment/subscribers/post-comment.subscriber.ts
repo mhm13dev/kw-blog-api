@@ -3,7 +3,6 @@ import {
   EventSubscriber,
   RemoveEvent,
 } from 'typeorm';
-import { ObjectId } from 'mongodb';
 import { PostComment } from '../entities';
 
 /**
@@ -31,25 +30,25 @@ export class PostCommentSubscriber
     if (!event.entity) {
       return;
     }
-    const deletingCommentId = event.entity._id;
-    const commentIdsToDelete: ObjectId[] = [];
+    const deletingCommentId = event.entity.id;
+    const commentIdsToDelete: string[] = [];
     const postCommentRepository = event.manager.getMongoRepository(PostComment);
 
     // Get all the children of the deleting comment
-    async function recurse(commentId: ObjectId) {
-      const comments: Pick<PostComment, '_id'>[] =
+    async function recurse(commentId: string) {
+      const comments: Pick<PostComment, 'id'>[] =
         await postCommentRepository.find({
           where: {
             reply_to_comment_id: commentId,
           },
-          select: ['_id'],
+          select: ['id'],
         });
       if (comments.length === 0) {
         return;
       }
       for (const comment of comments) {
-        commentIdsToDelete.push(comment._id);
-        await recurse(comment._id);
+        commentIdsToDelete.push(comment.id);
+        await recurse(comment.id);
       }
     }
 
@@ -57,7 +56,7 @@ export class PostCommentSubscriber
 
     // Delete all children comments
     await postCommentRepository.deleteMany({
-      _id: { $in: commentIdsToDelete },
+      id: { $in: commentIdsToDelete },
     });
   }
 }

@@ -42,10 +42,24 @@ type BlogPost {
   updated_at: DateTime!
 }
 
+type PostComment {
+  id: ID!
+  author_id: String!
+  author: User!
+  post_id: String!
+  post: BlogPost!
+  parent_comment_id: String
+  parent_comment: PostComment
+  content: String!
+  created_at: DateTime!
+  updated_at: DateTime!
+}
+
 type Query {
   me: User!
   posts(input: PaginationInput): [BlogPost!]!
   post(input: UUIDDTO!): BlogPost!
+  comments(input: GetPostCommentsInput!): [PostComment!]!
 }
 
 input PaginationInput {
@@ -63,6 +77,13 @@ input UUIDDTO {
   id: String!
 }
 
+input GetPostCommentsInput {
+  limit: Int = 10
+  offset: Int = 0
+  sort: SortOrder = DESC
+  post_id: String!
+}
+
 type Mutation {
   registerUser(input: RegisterUserInput!): User!
   loginUser(input: LoginUserInput!): LoginUserResponse!
@@ -71,6 +92,8 @@ type Mutation {
   createPost(input: CreateBlogPostInput!): BlogPost!
   updatePost(input: UpdateBlogPostInput!): BlogPost!
   deletePost(input: UUIDDTO!): Boolean!
+  createPostComment(input: CreatePostCommentInput!): PostComment!
+  deletePostComment(input: UUIDDTO!): Boolean!
 }
 
 input RegisterUserInput {
@@ -93,4 +116,10 @@ input UpdateBlogPostInput {
   title: String
   content: String
   id: String!
+}
+
+input CreatePostCommentInput {
+  post_id: String
+  parent_comment_id: String
+  content: String!
 }

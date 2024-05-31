@@ -3,16 +3,15 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  ObjectIdColumn,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { ObjectId } from 'mongodb';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { User } from 'src/user/entities';
 import { BlogPost } from 'src/blog-post/entities';
-import { IsMongoObjectId } from 'src/common/validators';
-import { ToMongoObjectId } from 'src/common/transformers';
 
 /**
  * `PostComment` entity for the Database and GraphQL Schema
@@ -23,14 +22,18 @@ import { ToMongoObjectId } from 'src/common/transformers';
 })
 export class PostComment {
   @Field(() => ID)
-  @ObjectIdColumn()
-  _id: ObjectId;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Field(() => String)
   @Column()
-  author_id: ObjectId;
+  author_id: string;
 
   @Field(() => User)
+  @ManyToOne(() => User, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'author_id' })
   author: User;
 
   /**
@@ -38,11 +41,14 @@ export class PostComment {
    */
   @Field(() => String)
   @Column()
-  @IsMongoObjectId()
-  @ToMongoObjectId()
-  post_id: ObjectId;
+  @IsUUID()
+  post_id: string;
 
   @Field(() => BlogPost)
+  @ManyToOne(() => BlogPost, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'post_id' })
   post: BlogPost;
 
   /**
@@ -52,12 +58,16 @@ export class PostComment {
    */
   @Field(() => String, { nullable: true })
   @Column({ nullable: true })
-  @IsMongoObjectId()
-  @ToMongoObjectId()
-  reply_to_comment_id?: ObjectId;
+  @IsUUID()
+  parent_comment_id?: string;
 
   @Field(() => PostComment, { nullable: true })
-  reply_to_comment?: PostComment;
+  @ManyToOne(() => PostComment, {
+    onDelete: 'CASCADE',
+    nullable: true,
+  })
+  @JoinColumn({ name: 'parent_comment_id' })
+  parent_comment?: PostComment;
 
   @Field(() => String)
   @Column()
@@ -67,14 +77,14 @@ export class PostComment {
   content: string;
 
   @Field()
-  @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  createdAt: Date;
+  @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
+  created_at: Date;
 
   @Field()
   @UpdateDateColumn({
-    type: 'timestamp',
+    type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
     onUpdate: 'CURRENT_TIMESTAMP',
   })
-  updatedAt: Date;
+  updated_at: Date;
 }
