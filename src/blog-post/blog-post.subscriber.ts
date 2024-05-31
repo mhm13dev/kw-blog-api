@@ -27,9 +27,11 @@ export class BlogPostSubscriber implements EntitySubscriberInterface<BlogPost> {
       index: [ES_BLOG_POSTS_INDEX, ES_POST_COMMENTS_INDEX],
       body: {
         query: {
-          multi_match: {
-            query: event.entityId,
-            fields: ['id', 'post_id'],
+          dis_max: {
+            queries: [
+              { term: { id: event.entityId } },
+              { term: { post_id: event.entityId } },
+            ],
           },
         },
       },
