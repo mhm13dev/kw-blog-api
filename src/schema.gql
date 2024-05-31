@@ -6,8 +6,14 @@ type User {
   _id: ID!
   email: String!
   name: String!
+  role: UserRole!
   createdAt: DateTime!
   updatedAt: DateTime!
+}
+
+enum UserRole {
+  admin
+  user
 }
 
 """

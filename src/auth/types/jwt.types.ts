@@ -1,4 +1,5 @@
 import { Field, ObjectType } from '@nestjs/graphql';
+import { UserRole } from 'src/user/entities';
 
 @ObjectType()
 export class TokensPair {
@@ -15,6 +16,7 @@ export class TokensPair {
 
 export class TokenPayload {
   sub: string;
+  role: UserRole;
   session_id: string;
 
   constructor(partial: Partial<TokenPayload>) {

@@ -1,4 +1,4 @@
-import { ObjectType, Field, ID } from '@nestjs/graphql';
+import { ObjectType, Field, ID, registerEnumType } from '@nestjs/graphql';
 import {
   Column,
   Entity,
@@ -12,6 +12,15 @@ import {
 import { Transform } from 'class-transformer';
 import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
 import * as argon2 from 'argon2';
+
+export enum UserRole {
+  admin = 'admin',
+  user = 'user',
+}
+
+registerEnumType(UserRole, {
+  name: 'UserRole',
+});
 
 @ObjectType()
 @Entity({
@@ -39,6 +48,13 @@ export class User {
   @Field()
   @Column()
   name: string;
+
+  @Field(() => UserRole)
+  @Column({
+    default: UserRole.user,
+    enum: UserRole,
+  })
+  role: UserRole;
 
   @Field()
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })

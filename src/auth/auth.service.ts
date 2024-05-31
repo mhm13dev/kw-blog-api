@@ -8,7 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Repository } from 'typeorm';
 import { ObjectId } from 'mongodb';
 import { instanceToPlain } from 'class-transformer';
-import { User } from 'src/user/entities';
+import { User, UserRole } from 'src/user/entities';
 import { UserService } from 'src/user/user.service';
 import { ConfigService } from 'src/config/config.service';
 import { TokenPayload, TokensPair } from './types/jwt.types';
@@ -41,6 +41,7 @@ export class AuthService {
       email: registerUserInput.email,
       password: registerUserInput.password,
       name: registerUserInput.email.split('@')[0],
+      role: UserRole.user,
     });
   }
 
@@ -59,6 +60,7 @@ export class AuthService {
 
     const tokenPayload = new TokenPayload({
       sub: user._id.toHexString(),
+      role: user.role,
       session_id: new ObjectId().toHexString(),
     });
 
