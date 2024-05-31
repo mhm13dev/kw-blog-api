@@ -55,29 +55,43 @@ type PostComment {
   updated_at: DateTime!
 }
 
-type SearchUserResponse {
+type SearchUser {
   id: ID!
   name: String!
 }
 
-type SearchPostResponse {
+type SearchBlogPostSource {
   id: ID!
   title: String!
   content: String!
-  author: SearchUserResponse!
+  author: SearchUser!
 }
 
-type SearchCommentResponse {
+type SearchPostCommentSource {
   id: ID!
   content: String!
-  author: SearchUserResponse!
+  author: SearchUser!
   post_id: String!
   parent_comment_id: String
 }
 
 type SearchResponseDto {
-  posts: [SearchPostResponse!]!
-  comments: [SearchCommentResponse!]!
+  results: [SearchResult!]!
+  pit_id: String!
+}
+
+union SearchResult = SearchBlogPost | SearchPostComment
+
+type SearchBlogPost {
+  _source: SearchBlogPostSource!
+  _sort: [Float!]!
+  _index: String!
+}
+
+type SearchPostComment {
+  _source: SearchPostCommentSource!
+  _sort: [Float!]!
+  _index: String!
 }
 
 type Query {
@@ -112,6 +126,9 @@ input GetPostCommentsInput {
 
 input SearchInputDto {
   query: String!
+  size: Int = 10
+  pit_id: String
+  search_after: [Float!]
 }
 
 type Mutation {

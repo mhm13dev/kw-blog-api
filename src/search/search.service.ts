@@ -1,52 +1,87 @@
 import { Injectable } from '@nestjs/common';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
-import { SearchResponse } from '@elastic/elasticsearch/lib/api/types';
+import { SearchRequest } from '@elastic/elasticsearch/lib/api/types';
 import { ES_BLOG_POSTS_INDEX } from 'src/blog-post/constants';
 import { ES_POST_COMMENTS_INDEX } from 'src/post-comment/constants';
-import { SearchInputDto, SearchResponseDto } from './dto';
+import {
+  SearchBlogPost,
+  SearchPostComment,
+  SearchInputDto,
+  SearchResponseDto,
+} from './dto';
 
 @Injectable()
 export class SearchService {
   constructor(private readonly elasticsearchService: ElasticsearchService) {}
 
-  async search(input: SearchInputDto): Promise<SearchResponseDto> {
-    const { responses } = await this.elasticsearchService.msearch({
-      searches: [
-        { index: ES_BLOG_POSTS_INDEX },
-        {
-          query: {
-            multi_match: {
-              query: input.query,
-              fields: ['title', 'content', 'author.name'],
-            },
-          },
-        },
-        { index: ES_POST_COMMENTS_INDEX },
-        {
-          query: {
-            multi_match: {
-              query: input.query,
-              fields: ['content', 'author.name'],
-            },
-          },
-        },
-      ],
+  async openPIT(): Promise<{
+    pid_id: string;
+  }> {
+    const pit = await this.elasticsearchService.openPointInTime({
+      index: [ES_BLOG_POSTS_INDEX, ES_POST_COMMENTS_INDEX],
+      keep_alive: '5m',
     });
 
-    const blogPostRes = responses[0] as SearchResponse<
-      SearchResponseDto['posts'][0]
-    >;
-    const postCommentRes = responses[1] as SearchResponse<
-      SearchResponseDto['comments'][0]
-    >;
-
     return {
-      posts: blogPostRes.hits.hits
-        .filter((hit) => !!hit._source)
-        .map((hit) => hit._source!),
-      comments: postCommentRes.hits.hits
-        .filter((hit) => !!hit._source)
-        .map((hit) => hit._source!),
+      pid_id: pit.id,
     };
+  }
+
+  async search({
+    query,
+    pit_id,
+    search_after,
+    size,
+  }: SearchInputDto): Promise<SearchResponseDto> {
+    const body: SearchRequest = {
+      query: {
+        multi_match: {
+          query,
+          fields: ['title', 'content', 'author.name'],
+        },
+      },
+      indices_boost: [
+        { [ES_BLOG_POSTS_INDEX]: 2 },
+        { [ES_POST_COMMENTS_INDEX]: 1 },
+      ],
+      sort: {
+        _score: {
+          order: 'desc',
+        },
+      },
+      size,
+      pit: {
+        id: pit_id!,
+        keep_alive: '5m',
+      },
+    };
+
+    if (search_after) {
+      body['search_after'] = search_after;
+    }
+
+    const response = await this.elasticsearchService.search<
+      SearchBlogPost['_source'] | SearchPostComment['_source']
+    >(body);
+
+    const resp = {
+      results: response.hits.hits.map((hit) => {
+        if (
+          hit._index === ES_BLOG_POSTS_INDEX ||
+          hit._index === ES_POST_COMMENTS_INDEX
+        ) {
+          return {
+            _source: hit._source,
+            _sort: hit.sort,
+            _index: hit._index,
+          };
+        } else {
+          throw new Error(`Unknown index: ${hit._index}`);
+        }
+      }) as (SearchBlogPost | SearchPostComment)[],
+      pit_id: response.pit_id!,
+    };
+
+    return resp;
   }
 }

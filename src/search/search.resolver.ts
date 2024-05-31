@@ -12,6 +12,23 @@ export class SearchResolver {
     @Input()
     input: SearchInputDto,
   ): Promise<SearchResponseDto> {
-    return this.searchService.search(input);
+    if (!input.pit_id) {
+      const { pid_id } = await this.searchService.openPIT();
+      input.pit_id = pid_id;
+    }
+
+    try {
+      return await this.searchService.search(input);
+    } catch (error) {
+      if (
+        error.meta?.body?.status === 404 &&
+        error.toString().includes('search_context_missing_exception')
+      ) {
+        const { pid_id } = await this.searchService.openPIT();
+        input.pit_id = pid_id;
+        return await this.searchService.search(input);
+      }
+      throw error;
+    }
   }
 }
