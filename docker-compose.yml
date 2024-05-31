@@ -26,22 +26,22 @@ services:
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     command: >
       bash -c '
-        if [ x${ELASTIC_PASSWORD} == x ]; then
-          echo "Set the ELASTIC_PASSWORD environment variable in the .env file";
+        if [ x${ELASTIC_USER_PASSWORD} == x ]; then
+          echo "Set the ELASTIC_USER_PASSWORD environment variable in the .env file";
           exit 1;
-        elif [ x${KIBANA_PASSWORD} == x ]; then
-          echo "Set the KIBANA_PASSWORD environment variable in the .env file";
+        elif [ x${KIBANA_SYSTEM_USER_PASSWORD} == x ]; then
+          echo "Set the KIBANA_SYSTEM_USER_PASSWORD environment variable in the .env file";
           exit 1;
         fi;
 
-        until curl -s -u elastic:${ELASTIC_PASSWORD} -XGET "http://es01:9200/_cluster/health?wait_for_status=yellow&timeout=30s"; do
+        until curl -s -u elastic:${ELASTIC_USER_PASSWORD} -XGET "http://es01:9200/_cluster/health?wait_for_status=yellow&timeout=30s"; do
           echo "Waiting for Elasticsearch to start up...";
           sleep 5;
         done;
         echo "Elasticsearch is up and running!";
         
         echo "Setting passwords...";
-        curl -s -u elastic:${ELASTIC_PASSWORD} -X POST "http://es01:9200/_security/user/kibana_system/_password" -H "Content-Type: application/json" -d"{\"password\":\"${KIBANA_PASSWORD}\"}";
+        curl -s -u elastic:${ELASTIC_USER_PASSWORD} -X POST "http://es01:9200/_security/user/kibana_system/_password" -H "Content-Type: application/json" -d"{\"password\":\"${KIBANA_SYSTEM_USER_PASSWORD}\"}";
         echo "\nAll Done!";
       '
   es01:
@@ -51,12 +51,12 @@ services:
     volumes:
       - esdata01:/usr/share/elasticsearch/data
     ports:
-      - ${ES_PORT}:9200
+      - ${ELASTIC_SEARCH_PORT}:9200
     environment:
       - node.name=es01
       - discovery.type=single-node
       - xpack.security.enabled=true
-      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - ELASTIC_PASSWORD=${ELASTIC_USER_PASSWORD}
   kibana:
     depends_on:
       - es_setup
@@ -69,7 +69,7 @@ services:
     environment:
       - ELASTICSEARCH_HOSTS=http://es01:9200
       - ELASTICSEARCH_USERNAME=kibana_system
-      - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
+      - ELASTICSEARCH_PASSWORD=${KIBANA_SYSTEM_USER_PASSWORD}
 
 volumes:
   postgres-data:
