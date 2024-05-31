@@ -1,4 +1,8 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ObjectId } from 'mongodb';
@@ -14,6 +18,12 @@ export class BlogPostService {
     private blogPostRepository: Repository<BlogPost>,
   ) {}
 
+  /**
+   * Creates a new `BlogPost`
+   * @param currentUserPayload - Logged in `User` payload
+   * @param input - Input data to create a new `BlogPost`
+   * @returns Created `BlogPost` object from the database
+   */
   createBlogPost(
     currentUserPayload: TokenPayload,
     input: CreateBlogPostInput,
@@ -26,6 +36,11 @@ export class BlogPostService {
     return this.blogPostRepository.save(blogPost);
   }
 
+  /**
+   * Get all `BlogPost` from the database with pagination
+   * @param input - Pagination options
+   * @returns Array of `BlogPost` objects
+   */
   getAllBlogPosts({
     limit,
     offset,
@@ -40,22 +55,43 @@ export class BlogPostService {
     });
   }
 
+  /**
+   * Get a single `BlogPost` by ID
+   * @param id - ID of the `BlogPost`
+   * @returns `BlogPost` if found, `null` otherwise
+   */
   findOneById(id: string): Promise<BlogPost | null> {
     return this.blogPostRepository.findOneBy({
       _id: new ObjectId(id),
     });
   }
 
+  /**
+   * Update a `BlogPost`
+   *
+   * Only the `author` of the `BlogPost` is allowed to update it.
+   *
+   * Only `title` and `content` fields can be updated.
+   *
+   * @param currentUserPayload - Logged in `User` payload
+   * @param input - Input data to update the `BlogPost`
+   * @returns Updated `BlogPost` object from the database
+   * @throws `ForbiddenException` If the `User` is not allowed to update the `BlogPost`
+   * @throws `NotFoundException` If the `BlogPost` is not found
+   */
   async updateBlogPost(
     currentUserPayload: TokenPayload,
     input: UpdateBlogPostInput,
   ): Promise<BlogPost> {
     const blogPost = await this.blogPostRepository.findOneBy({
       _id: input._id,
-      author_id: new ObjectId(currentUserPayload.sub),
     });
 
     if (!blogPost) {
+      throw new NotFoundException('Post not found');
+    }
+
+    if (!blogPost.author_id.equals(new ObjectId(currentUserPayload.sub))) {
       throw new ForbiddenException('You are not allowed to update this post');
     }
 
@@ -67,20 +103,33 @@ export class BlogPostService {
     return this.blogPostRepository.save(updatedBlogPost);
   }
 
+  /**
+   * Delete a `BlogPost`
+   *
+   * Only the `author` of the `BlogPost` is allowed to delete it.
+   *
+   * All the associated `PostComment` with the `BlogPost` will be deleted by the `BlogPostSubscriber`.
+   *
+   * @param currentUserPayload - Logged in `User` payload
+   * @param _id - ID of the `BlogPost`
+   * @returns `true` if the `BlogPost` is deleted successfully
+   * @throws `NotFoundException` If the `BlogPost` is not found
+   * @throws `ForbiddenException` If the `User` is not the `author` of the `BlogPost`
+   */
   async deleteBlogPost(
     currentUserPayload: TokenPayload,
     _id: string,
-  ): Promise<void> {
+  ): Promise<boolean> {
     const blogPost = await this.blogPostRepository.findOneBy({
       _id: new ObjectId(_id),
     });
     if (!blogPost) {
-      throw new ForbiddenException('You are not allowed to delete this post');
+      throw new NotFoundException('Post not found');
     }
     if (!blogPost.author_id.equals(new ObjectId(currentUserPayload.sub))) {
       throw new ForbiddenException('You are not the author of this post');
     }
-    // INFO: all the associated comments will be removed by the BlogPostSubscriber
     await this.blogPostRepository.remove(blogPost);
+    return true;
   }
 }

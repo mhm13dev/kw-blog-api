@@ -18,6 +18,11 @@ import { CreateBlogPostInput, UpdateBlogPostInput } from './dto';
 import { BlogPost } from './entities';
 import { BlogPostService } from './blog-post.service';
 
+/**
+ * Resolver for `BlogPost` entity.
+ *
+ * This resolver is responsible for handling all the queries and mutations related to the `BlogPost` entity.
+ */
 @Resolver(() => BlogPost)
 export class BlogPostResolver {
   constructor(
@@ -25,6 +30,12 @@ export class BlogPostResolver {
     private readonly userService: UserService,
   ) {}
 
+  /**
+   * Mutation to create a new `BlogPost`
+   * @param currentUserPayload - Logged in `User` payload
+   * @param input - Input data to create a new `BlogPost`
+   * @returns Created `BlogPost` object from the database
+   */
   @Mutation(() => BlogPost, {
     name: 'createPost',
   })
@@ -36,6 +47,11 @@ export class BlogPostResolver {
     return this.blogPostService.createBlogPost(currentUserPayload, input);
   }
 
+  /**
+   * Query to get all `BlogPost` from the database with pagination
+   * @param input - Pagination options
+   * @returns Array of `BlogPost` objects
+   */
   @Query(() => [BlogPost], {
     name: 'posts',
   })
@@ -46,6 +62,12 @@ export class BlogPostResolver {
     return this.blogPostService.getAllBlogPosts(input);
   }
 
+  /**
+   * Query to get a single `BlogPost` by ID
+   * @param input - ID of the `BlogPost`
+   * @returns `BlogPost` object from the database
+   * @throws `NotFoundException` If the `BlogPost` is not found
+   */
   @Query(() => BlogPost, {
     name: 'post',
   })
@@ -59,17 +81,12 @@ export class BlogPostResolver {
     return post;
   }
 
-  @ResolveField('author', () => User)
-  async getAuthor(@Parent() post: BlogPost): Promise<User> {
-    const author = await this.userService.findOneById(
-      post.author_id.toHexString(),
-    );
-    if (!author) {
-      throw new NotFoundException('Author not found');
-    }
-    return author;
-  }
-
+  /**
+   * Mutation to update a `BlogPost`
+   * @param currentUserPayload - Logged in `User` payload
+   * @param input - Input data to update a `BlogPost`
+   * @returns Updated `BlogPost` object from the database
+   */
   @Mutation(() => BlogPost, {
     name: 'updatePost',
   })
@@ -81,18 +98,40 @@ export class BlogPostResolver {
     return this.blogPostService.updateBlogPost(currentUserPayload, input);
   }
 
+  /**
+   * Mutation to delete a `BlogPost`
+   * @param currentUserPayload - Logged in `User` payload
+   * @param input - ID of the `BlogPost`
+   * @returns `true` if the `BlogPost` is deleted successfully
+   */
   @Mutation(() => Boolean, {
     name: 'deletePost',
   })
   @UseGuards(GqlAccessTokenGuard)
-  async deleteBlogPost(
+  deleteBlogPost(
     @CurrentUserPayload() currentUserPayload: TokenPayload,
     @Input() input: ObjectIdDto,
   ): Promise<boolean> {
-    await this.blogPostService.deleteBlogPost(
+    return this.blogPostService.deleteBlogPost(
       currentUserPayload,
       input._id.toHexString(),
     );
-    return true;
+  }
+
+  /**
+   * FieldResolver to get the `User` object for the `author` of the `BlogPost`
+   * @param post - `BlogPost` object
+   * @returns `User` object for the `author` of the `BlogPost`
+   * @throws `NotFoundException` If the `User / author` is not found
+   */
+  @ResolveField('author', () => User)
+  async getAuthor(@Parent() post: BlogPost): Promise<User> {
+    const author = await this.userService.findOneById(
+      post.author_id.toHexString(),
+    );
+    if (!author) {
+      throw new NotFoundException('Author not found');
+    }
+    return author;
   }
 }
