@@ -12,12 +12,12 @@ export class AuthService {
   constructor(private readonly userService: UserService) {}
 
   async registerUser(registerUserInput: RegisterUserInput): Promise<User> {
-    // check if password match
+    // Check if passwords match
     if (registerUserInput.password !== registerUserInput.confirm_password) {
       throw new BadRequestException('Passwords do not match');
     }
 
-    // check if user already exist
+    // Check if user already exist
     if (!!(await this.userService.findOneByEmail(registerUserInput.email))) {
       throw new ForbiddenException('Email already exist');
     }
@@ -25,7 +25,7 @@ export class AuthService {
     // Create User
     return this.userService.create({
       email: registerUserInput.email,
-      password: registerUserInput.password, // TODO: hash password
+      password: registerUserInput.password,
       name: registerUserInput.email.split('@')[0],
     });
   }

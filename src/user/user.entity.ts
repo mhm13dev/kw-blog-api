@@ -6,9 +6,12 @@ import {
   ObjectIdColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  BeforeInsert,
+  BeforeUpdate,
 } from 'typeorm';
 import { Transform } from 'class-transformer';
 import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
+import * as argon2 from 'argon2';
 
 @ObjectType()
 @Entity({
@@ -48,4 +51,12 @@ export class User {
     onUpdate: 'CURRENT_TIMESTAMP',
   })
   updatedAt: Date;
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  async hashPassword() {
+    if (this.password) {
+      this.password = await argon2.hash(this.password);
+    }
+  }
 }
