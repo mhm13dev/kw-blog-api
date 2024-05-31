@@ -7,8 +7,8 @@ type User {
   email: String!
   name: String!
   role: UserRole!
-  createdAt: DateTime!
-  updatedAt: DateTime!
+  created_at: DateTime!
+  updated_at: DateTime!
 }
 
 enum UserRole {
@@ -44,6 +44,35 @@ type PostComment {
   updatedAt: DateTime!
 }
 
+type LoginUserResponse {
+  access_token: String!
+  refresh_token: String!
+  user: User!
+}
+
+type RefreshTokensResponse {
+  access_token: String!
+  refresh_token: String!
+}
+
 type Query {
   me: User!
+}
+
+type Mutation {
+  registerUser(input: RegisterUserInput!): User!
+  loginUser(input: LoginUserInput!): LoginUserResponse!
+  refreshTokens: RefreshTokensResponse!
+  logout: Boolean!
+}
+
+input RegisterUserInput {
+  email: String!
+  password: String!
+  confirm_password: String!
+}
+
+input LoginUserInput {
+  email: String!
+  password: String!
 }

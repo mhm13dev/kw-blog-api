@@ -7,8 +7,8 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Repository } from 'typeorm';
-import { ObjectId } from 'mongodb';
 import { instanceToPlain } from 'class-transformer';
+import { v4 as uuidV4 } from 'uuid';
 import { User, UserRole } from 'src/user/entities';
 import { UserService } from 'src/user/user.service';
 import { AppConfigService } from 'src/config/config.service';
@@ -95,12 +95,12 @@ export class AuthService {
     const tokenPayload = new TokenPayload({
       sub: user.id,
       role: user.role,
-      session_id: new ObjectId().toHexString(),
+      session_id: uuidV4(),
     });
     const tokensPair = await this.generateTokensPair(tokenPayload);
 
     // Create User Session
-    await this.createSession(tokenPayload, tokensPair.refresh_token);
+    await this.createSession(user, tokenPayload, tokensPair.refresh_token);
 
     return new LoginUserResponse({
       user,
@@ -133,7 +133,7 @@ export class AuthService {
   ): Promise<RefreshTokensResponse> {
     // Check if session exist
     const userSession = await this.userSessionRepository.findOneBy({
-      _id: new ObjectId(currentUserPayload.session_id),
+      id: currentUserPayload.session_id,
     });
 
     if (!userSession) {
@@ -174,9 +174,13 @@ export class AuthService {
    */
   async logout(currentUserPayload: TokenPayload): Promise<boolean> {
     // Delete User Session
-    await this.userSessionRepository.delete({
-      _id: new ObjectId(currentUserPayload.session_id),
+    const session = await this.userSessionRepository.findOneBy({
+      id: currentUserPayload.session_id,
     });
+    if (!session) {
+      return true;
+    }
+    await this.userSessionRepository.remove(session);
     return true;
   }
 
@@ -209,12 +213,13 @@ export class AuthService {
    * @returns `void`
    */
   private async createSession(
+    user: User,
     tokenPayload: TokenPayload,
     refreshToken: string,
   ): Promise<void> {
     const userSession = this.userSessionRepository.create({
-      _id: new ObjectId(tokenPayload.session_id),
-      user_id: new ObjectId(tokenPayload.sub),
+      id: tokenPayload.session_id,
+      user,
       refresh_token: refreshToken,
     });
     await this.userSessionRepository.save(userSession);

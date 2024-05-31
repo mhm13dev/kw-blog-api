@@ -25,7 +25,9 @@ registerEnumType(UserRole, {
  * `User` entity for the Database and GraphQL Schema
  */
 @ObjectType()
-@Entity()
+@Entity({
+  name: 'users',
+})
 export class User {
   @Field(() => ID)
   @PrimaryGeneratedColumn('uuid')
@@ -65,7 +67,7 @@ export class User {
 
   @Field()
   @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
-  createdAt: Date;
+  created_at: Date;
 
   @Field()
   @UpdateDateColumn({
@@ -73,7 +75,7 @@ export class User {
     default: () => 'CURRENT_TIMESTAMP',
     onUpdate: 'CURRENT_TIMESTAMP',
   })
-  updatedAt: Date;
+  updated_at: Date;
 
   /**
    * Hashes the password before inserting or updating the `User`

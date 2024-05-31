@@ -1,14 +1,15 @@
 import {
   Column,
   Entity,
-  ObjectIdColumn,
   CreateDateColumn,
   UpdateDateColumn,
   BeforeInsert,
   BeforeUpdate,
+  PrimaryGeneratedColumn,
+  ManyToOne,
 } from 'typeorm';
-import { ObjectId } from 'mongodb';
 import * as argon2 from 'argon2';
+import { User } from 'src/user/entities';
 
 /**
  * `UserSession` entity for the Database
@@ -17,24 +18,27 @@ import * as argon2 from 'argon2';
   name: 'user_sessions',
 })
 export class UserSession {
-  @ObjectIdColumn()
-  _id: ObjectId;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-  @Column()
-  user_id: ObjectId;
+  @ManyToOne(() => User, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  user: User;
 
   @Column()
   refresh_token: string;
 
-  @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  createdAt: Date;
+  @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
+  created_at: Date;
 
   @UpdateDateColumn({
-    type: 'timestamp',
+    type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
     onUpdate: 'CURRENT_TIMESTAMP',
   })
-  updatedAt: Date;
+  updated_at: Date;
 
   /**
    * Hashes the `refresh_token` before inserting or updating the `UserSession`.
