@@ -22,6 +22,9 @@ registerEnumType(UserRole, {
   name: 'UserRole',
 });
 
+/**
+ * `User` entity for the Database and GraphQL Schema
+ */
 @ObjectType()
 @Entity({
   name: 'users',
@@ -68,9 +71,14 @@ export class User {
   })
   updatedAt: Date;
 
+  /**
+   * Hashes the password before inserting or updating the `User`
+   *
+   * Uses the {@link https://www.npmjs.com/package/argon2 | argon2} library to hash the password
+   */
   @BeforeInsert()
   @BeforeUpdate()
-  async hashPassword() {
+  async hashPassword(): Promise<void> {
     if (this.password) {
       this.password = await argon2.hash(this.password);
     }

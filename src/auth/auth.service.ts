@@ -21,6 +21,9 @@ import {
   RegisterUserInput,
 } from './dto';
 
+/**
+ * Service for operations related to `User` authentication
+ */
 @Injectable()
 export class AuthService {
   constructor(
@@ -31,6 +34,17 @@ export class AuthService {
     private readonly userSessionRepository: Repository<UserSession>,
   ) {}
 
+  /**
+   * Creates a new `User` in the database.
+   *
+   * It first compares the `password` and `confirm_password`.
+   * Then checks if the `User` with the same `email` does not exist in the database.
+   * If not, it creates a new `User` in the database.
+   * @param input - Input data for registering a new `User`
+   * @returns Created `User` object from the database
+   * @throws `BadRequestException` If the input data is invalid or passwords do not match
+   * @throws `ForbiddenException` If the `User` with email already exists
+   */
   async registerUser(input: RegisterUserInput): Promise<User> {
     // Check if passwords match
     if (input.password !== input.confirm_password) {
@@ -51,6 +65,19 @@ export class AuthService {
     });
   }
 
+  /**
+   * Login a `User`.
+   *
+   * It first checks if the `User` with the `email` exists.
+   * Then compares the input password with the hashed password in the database.
+   * If everything is fine, it generates a new `access_token` and `refresh_token`.
+   * It creates a new `UserSession` in the database.
+   * The `session_id` is stored in the `access_token` and `refresh_token` payload.
+   * The `refresh_token` is hashed and stored in the `UserSession`.
+   * @param input - Input data for logging in a `User`
+   * @returns `access_token`, `refresh_token` and `User` object
+   * @throws `BadRequestException` If the `email` or `password` are invalid
+   */
   async loginUser(input: LoginUserInput): Promise<LoginUserResponse> {
     // Check if user exist
     const user = await this.userService.findOneByEmail(input.email);
@@ -82,6 +109,25 @@ export class AuthService {
     });
   }
 
+  /**
+   * Refresh the `access_token` and `refresh_token`.
+   *
+   * It first checks if the `UserSession` exists.
+   * Then compares `refreshToken` with the hashed `refresh_token` from the database.
+   * If everything is fine, it generates a new `access_token` and `refresh_token`.
+   * It updates the `refresh_token` stored in the `UserSession`.
+   *
+   * It employs `token rotation` and `automatic reuse detection`.
+   *
+   * {@link https://auth0.com/blog/refresh-tokens-what-are-they-and-when-to-use-them/ | Refresh Tokens with Automatic Reuse Detection}.
+   *
+   * @param currentUserPayload - Logged in `User` payload
+   * @param refreshToken - Refresh token from the authorization header
+   * @returns `access_token` and `refresh_token`
+   * @throws `UnauthorizedException` If `refreshToken` is invalid or expired
+   * @throws `UnauthorizedException("Invalid session")` If the `UserSession` is not found i.e. `User` is logged out
+   * @throws `UnauthorizedException("Compromised refresh token")` If an old `refreshToken` of the same `UserSession` is used
+   */
   async refreshTokens(
     currentUserPayload: TokenPayload,
     refreshToken: string,
@@ -97,7 +143,7 @@ export class AuthService {
 
     // Check if refresh token match
     if (!(await userSession.compareRefreshToken(refreshToken))) {
-      // If doesn't match, delete session because someone is using an old refresh token of the current session. The refresh token is compromised.
+      // If doesn't match, delete session because someone is using an old `refreshToken` of the current session. The `refreshToken` is compromised.
       await this.userSessionRepository.remove(userSession);
       throw new UnauthorizedException('Compromised refresh token');
     }
@@ -120,6 +166,13 @@ export class AuthService {
     });
   }
 
+  /**
+   * Logout a `User`.
+   *
+   * It deletes the `UserSession` from the database.
+   * @param currentUserPayload - Logged in `User` payload
+   * @returns `true` if the `UserSession` is deleted successfully
+   */
   async logout(currentUserPayload: TokenPayload): Promise<boolean> {
     // Delete User Session
     await this.userSessionRepository.delete({
@@ -128,6 +181,15 @@ export class AuthService {
     return true;
   }
 
+  /**
+   * Generates a new `access_token` and `refresh_token`.
+   *
+   * It uses separete `ACCESS_TOKEN_SECRET` and `REFRESH_TOKEN_SECRET` to sign the tokens.
+   * The `access_token` has expiration time of `15 minutes` and `refresh_token` has expiration time of `7 days`.
+   * The expiration time and secrets can be configured in the `.env` file.
+   * @param payload - Payload to be stored in the `access_token` and `refresh_token`
+   * @returns `access_token` and `refresh_token`
+   */
   private async generateTokensPair(payload: TokenPayload): Promise<TokensPair> {
     return new TokensPair({
       access_token: await this.jwtService.signAsync(instanceToPlain(payload), {
@@ -141,6 +203,12 @@ export class AuthService {
     });
   }
 
+  /**
+   * Creates a new `UserSession` in the database.
+   * @param tokenPayload - Payload of the `access_token` and `refresh_token`
+   * @param refreshToken - Refresh token to be stored in the `UserSession`
+   * @returns `void`
+   */
   private async createSession(
     tokenPayload: TokenPayload,
     refreshToken: string,
