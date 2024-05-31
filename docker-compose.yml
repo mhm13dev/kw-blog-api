@@ -54,7 +54,6 @@ services:
       - ${ES_PORT}:9200
     environment:
       - node.name=es01
-      - cluster.name=${CLUSTER_NAME}
       - discovery.type=single-node
       - xpack.security.enabled=true
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
