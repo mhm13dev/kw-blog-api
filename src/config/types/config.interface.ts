@@ -8,7 +8,7 @@ export interface IConfig {
   };
 
   database: {
-    mongodb: TypeOrmModuleOptions;
+    MONGODB: TypeOrmModuleOptions;
   };
 
   auth: {

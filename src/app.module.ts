@@ -15,7 +15,7 @@ import { AppService } from './app.service';
     ConfigModule.register(),
     TypeOrmModule.forRootAsync({
       useFactory: (configService: ConfigService) => {
-        return configService.database.mongodb;
+        return configService.database.MONGODB;
       },
       inject: [ConfigService],
     }),

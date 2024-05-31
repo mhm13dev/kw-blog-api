@@ -8,7 +8,7 @@ export function getConfig(): IConfig {
       PORT: parseInt(process.env.PORT, 10) || 5001,
     },
     database: {
-      mongodb: {
+      MONGODB: {
         type: 'mongodb',
         username: process.env.MONGO_INITDB_ROOT_USERNAME,
         password: process.env.MONGO_INITDB_ROOT_PASSWORD,
