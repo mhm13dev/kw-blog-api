@@ -11,6 +11,9 @@ import { PaginationInput } from 'src/common/dto';
 import { CreateBlogPostInput, UpdateBlogPostInput } from './dto';
 import { BlogPost } from './entities';
 
+/**
+ * Service for operations related to `BlogPost` entity.
+ */
 @Injectable()
 export class BlogPostService {
   constructor(
