@@ -45,6 +45,7 @@ type BlogPost {
 type Query {
   me: User!
   posts(getBlogPostInput: GetBlogPostInput): [BlogPost!]!
+  post(_id: String!): BlogPost!
 }
 
 input GetBlogPostInput {

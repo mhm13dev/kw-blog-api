@@ -1,5 +1,5 @@
 import { Resolver, Mutation, Args, Query } from '@nestjs/graphql';
-import { UseGuards } from '@nestjs/common';
+import { NotFoundException, UseGuards } from '@nestjs/common';
 import { GqlAccessTokenGuard } from 'src/auth/guards';
 import { CurrentUserPayload } from 'src/auth/decorators';
 import { TokenPayload } from 'src/auth/types/jwt.types';
@@ -31,5 +31,16 @@ export class BlogPostResolver {
     getBlogPostInput: GetBlogPostInput,
   ): Promise<BlogPost[]> {
     return this.blogPostService.getBlogPosts(getBlogPostInput);
+  }
+
+  @Query(() => BlogPost, {
+    name: 'post',
+  })
+  async getOneBlogPost(@Args('_id') _id: string): Promise<BlogPost> {
+    const post = await this.blogPostService.findOneById(_id);
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+    return post;
   }
 }

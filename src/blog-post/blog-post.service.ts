@@ -35,4 +35,10 @@ export class BlogPostService {
       skip: offset,
     });
   }
+
+  findOneById(id: string): Promise<BlogPost> {
+    return this.blogPostRepository.findOneBy({
+      _id: new ObjectId(id),
+    });
+  }
 }
