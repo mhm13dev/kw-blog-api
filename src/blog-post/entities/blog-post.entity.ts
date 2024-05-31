@@ -1,4 +1,4 @@
-import { ObjectType, Field, Int, ID } from '@nestjs/graphql';
+import { ObjectType, Field, ID } from '@nestjs/graphql';
 import {
   Column,
   CreateDateColumn,
@@ -34,10 +34,6 @@ export class BlogPost {
   @Transform(({ value }) => value?.toString().trim())
   @MaxLength(1000)
   content: string;
-
-  @Field(() => Int)
-  @Column()
-  upvotes: number;
 
   @Field()
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })

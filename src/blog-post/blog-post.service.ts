@@ -21,7 +21,6 @@ export class BlogPostService {
       author_id: new ObjectId(currentUserPayload.sub),
       title: createBlogPostInput.title,
       content: createBlogPostInput.content,
-      upvotes: 0,
     });
     return this.blogPostRepository.save(blogPost);
   }

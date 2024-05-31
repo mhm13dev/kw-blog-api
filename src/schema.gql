@@ -37,7 +37,6 @@ type BlogPost {
   author_id: String!
   title: String!
   content: String!
-  upvotes: Int!
   createdAt: DateTime!
   updatedAt: DateTime!
 }
