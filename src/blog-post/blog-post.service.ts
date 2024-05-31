@@ -80,7 +80,6 @@ export class BlogPostService {
     if (!blogPost.author_id.equals(new ObjectId(currentUserPayload.sub))) {
       throw new ForbiddenException('You are not the author of this post');
     }
-
     // INFO: all the associated comments will be removed by the BlogPostSubscriber
     await this.blogPostRepository.remove(blogPost);
   }

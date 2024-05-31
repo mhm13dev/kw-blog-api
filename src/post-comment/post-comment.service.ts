@@ -84,40 +84,9 @@ export class PostCommentService {
     if (!postComment.author_id.equals(new ObjectId(currentUserPayload.sub))) {
       throw new ForbiddenException('You are not the author of this comment');
     }
-    // If the comment has nested comments, delete them as well
-    await this.deleteCommentAndAllNestedComments(postComment._id);
+    // INFO: all the nested comments will be removed by the PostCommentSubscriber
+    await this.postCommentRepository.remove(postComment);
     return true;
-  }
-
-  private async deleteCommentAndAllNestedComments(commentId: ObjectId) {
-    const commentIdsToDelete: ObjectId[] = [commentId];
-
-    async function recurse(
-      commentId: ObjectId,
-      postCommentRepository: MongoRepository<PostComment>,
-      commentIdsToDelete: ObjectId[],
-    ) {
-      // Get all comments that are replying to the comment
-      const comments = await postCommentRepository.find({
-        where: {
-          reply_to_comment_id: commentId,
-        },
-      });
-      if (comments.length === 0) {
-        return;
-      }
-      // Recursively delete all nested comments
-      for (const comment of comments) {
-        commentIdsToDelete.push(comment._id);
-        await recurse(comment._id, postCommentRepository, commentIdsToDelete);
-      }
-    }
-    await recurse(commentId, this.postCommentRepository, commentIdsToDelete);
-
-    // Delete all comments
-    await this.postCommentRepository.deleteMany({
-      _id: { $in: commentIdsToDelete },
-    });
   }
 
   findOneById(id: string): Promise<PostComment> {
