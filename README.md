@@ -18,7 +18,8 @@ npm install
 
 ## Admin User Creation
 
-To create a user with the role of `admin`, you need to run seed script.
+To create a user with the role of `admin`, you need to run seed script. If you want to run it yourself, you can follow the instructions.
+💥 Otherwise, when you start the development server, the migrations and seed scripts will run automatically as defined in `docker-compose.yml` file.
 
 ## Database Migration and Seed
 

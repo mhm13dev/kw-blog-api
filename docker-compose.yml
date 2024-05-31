@@ -8,7 +8,7 @@ services:
       - .:/app
     depends_on:
       - postgres
-    command: sh -c "npm install && npm run start:dev"
+    command: sh -c "export POSTGRES_HOST=${POSTGRES_HOST} npm install && npm run typeorm:migration:run && npm run typeorm:seed && npm run start:dev"
   postgres:
     image: postgres:16
     ports:
