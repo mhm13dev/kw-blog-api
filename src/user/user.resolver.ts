@@ -12,7 +12,7 @@ export class UserResolver {
   @Query(() => User)
   @UseGuards(GqlAccessTokenGuard)
   async me(@CurrentUserPayload('sub') userId: string): Promise<User> {
-    const user = this.userService.findOneById(userId);
+    const user = await this.userService.findOneById(userId);
     if (!user) {
       throw new NotFoundException('User not found');
     }
