@@ -6,6 +6,9 @@ import { TokenPayload } from '../types/jwt.types';
 
 export const RefreshTokenStrategyName = 'jwt-refresh-token';
 
+/**
+ * This passport strategy is used to validate the JWT refresh token provided in the Authorization header and attaches the `TokenPayload` to the `req.user` object.
+ */
 @Injectable()
 export class RefreshTokenStrategy extends PassportStrategy(
   Strategy,
@@ -20,7 +23,6 @@ export class RefreshTokenStrategy extends PassportStrategy(
   }
 
   async validate(payload: TokenPayload) {
-    // TODO: add refresh token in the payload
     return payload;
   }
 }

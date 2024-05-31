@@ -6,6 +6,9 @@ import { TokenPayload } from '../types/jwt.types';
 
 export const AccessTokenStrategyName = 'jwt-accesss-token';
 
+/**
+ * This passport strategy is used to validate the JWT access token provided in the Authorization header and attaches the `TokenPayload` to the `req.user` object.
+ */
 @Injectable()
 export class AccessTokenStrategy extends PassportStrategy(
   Strategy,
