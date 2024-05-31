@@ -105,7 +105,7 @@ export class PostCommentService {
   }
 
   /**
-   * Deletes a `PostComment` from the database and Elasticsearch.
+   * Deletes a `PostComment` from the database and Elasticsearch (via PostCommentSubscriber).
    *
    * Only the author of the `PostComment` is allowed to delete it.
    *
@@ -132,7 +132,6 @@ export class PostCommentService {
       throw new ForbiddenException('You are not the author of this comment');
     }
     await this.postCommentRepository.remove(postComment);
-    this.removePostCommentFromIndex(commentId);
     return true;
   }
 
@@ -205,17 +204,6 @@ export class PostCommentService {
           name: postComment.author.name,
         },
       },
-    });
-  }
-
-  /**
-   * Remove `PostComment` from Elasticsearch.
-   * @param id - ID of the `PostComment`
-   */
-  removePostCommentFromIndex(id: string): void {
-    this.elasticsearchService.delete({
-      index: ES_POST_COMMENTS_INDEX,
-      id,
     });
   }
 }

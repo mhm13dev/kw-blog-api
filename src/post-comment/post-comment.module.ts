@@ -5,6 +5,7 @@ import { BlogPostModule } from 'src/blog-post/blog-post.module';
 import { ElasticsearchModule } from 'src/elasticsearch/elasticsearch.module';
 import { PostCommentService } from './post-comment.service';
 import { PostCommentResolver } from './post-comment.resolver';
+import { PostCommentSubscriber } from './post-comment.subscriber';
 import { PostComment } from './entities';
 
 @Module({
@@ -14,7 +15,7 @@ import { PostComment } from './entities';
     BlogPostModule,
     ElasticsearchModule,
   ],
-  providers: [PostCommentResolver, PostCommentService],
+  providers: [PostCommentResolver, PostCommentService, PostCommentSubscriber],
 })
 export class PostCommentModule implements OnModuleInit {
   constructor(private readonly postCommentService: PostCommentService) {}
