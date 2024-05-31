@@ -32,6 +32,16 @@ type RefreshTokensResponse {
   refresh_token: String!
 }
 
+type BlogPost {
+  _id: ID!
+  author_id: String!
+  title: String!
+  content: String!
+  upvotes: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
 type Query {
   me: User!
 }
@@ -41,6 +51,7 @@ type Mutation {
   loginUser(loginUserInput: LoginUserInput!): LoginUserResponse!
   refreshTokens: RefreshTokensResponse!
   logout: Boolean!
+  createBlogPost(createBlogPostInput: CreateBlogPostInput!): BlogPost!
 }
 
 input RegisterUserInput {
@@ -52,4 +63,9 @@ input RegisterUserInput {
 input LoginUserInput {
   email: String!
   password: String!
+}
+
+input CreateBlogPostInput {
+  title: String!
+  content: String!
 }

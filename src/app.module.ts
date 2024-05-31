@@ -7,6 +7,7 @@ import { ConfigModule } from './config/config.module';
 import { ConfigService } from './config/config.service';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { BlogPostModule } from './blog-post/blog-post.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -25,6 +26,7 @@ import { AppService } from './app.service';
     }),
     UserModule,
     AuthModule,
+    BlogPostModule,
   ],
   controllers: [AppController],
   providers: [AppService],
