@@ -19,7 +19,7 @@ export function getConfig(): IConfig {
         host: process.env.POSTGRES_HOST,
         port: parseInt(process.env.POSTGRES_PORT!, 10),
         autoLoadEntities: true,
-        synchronize: process.env.NODE_ENV !== 'production',
+        synchronize: false, // It's better to generate and run migrations when entities change
       },
     },
     auth: {

@@ -22,7 +22,14 @@
     "docker:stop:dev": "docker compose -f docker-compose.yml down",
     "docker:start:migrations": "docker compose -f docker-compose.migrations.yml up -d",
     "docker:stop:migrations": "docker compose -f docker-compose.migrations.yml down",
-    "seed:create:admin": "ts-node -r tsconfig-paths/register ./seeds/create-admin.ts"
+    "seed:create:admin": "ts-node -r tsconfig-paths/register ./seeds/create-admin.ts",
+    "typeorm:cli": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
+    "typeorm:migration:create": "npm run typeorm:cli -- migration:create",
+    "typeorm:migration:generate": "npm run typeorm:cli -- migration:generate -d typeorm-data-source.ts",
+    "typeorm:migration:run": "npm run typeorm:cli -- migration:run -d typeorm-data-source.ts",
+    "typeorm:migration:revert": "npm run typeorm:cli -- migration:revert -d typeorm-data-source.ts",
+    "typeorm:migration:show": "npm run typeorm:cli -- migration:show -d typeorm-data-source.ts",
+    "typeorm:schema:drop": "npm run typeorm:cli -- schema:drop -d typeorm-data-source.ts"
   },
   "dependencies": {
     "@apollo/server": "^4.10.4",
@@ -40,7 +47,6 @@
     "class-validator": "^0.14.1",
     "dotenv": "^16.4.5",
     "graphql": "^16.8.1",
-    "migrate-mongo": "^11.0.0",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "pg": "^8.11.5",
