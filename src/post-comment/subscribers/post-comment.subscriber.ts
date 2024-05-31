@@ -18,6 +18,9 @@ export class PostCommentSubscriber
   }
 
   async beforeRemove(event: RemoveEvent<PostComment>) {
+    if (!event.entity) {
+      return;
+    }
     const deletingCommentId = event.entity._id;
     const commentIdsToDelete: ObjectId[] = [];
     const postCommentRepository = event.manager.getMongoRepository(PostComment);

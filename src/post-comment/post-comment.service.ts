@@ -89,7 +89,7 @@ export class PostCommentService {
     return true;
   }
 
-  findOneById(id: string): Promise<PostComment> {
+  findOneById(id: string): Promise<PostComment | null> {
     return this.postCommentRepository.findOneBy({
       _id: new ObjectId(id),
     });

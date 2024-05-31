@@ -40,7 +40,7 @@ export class BlogPostService {
     });
   }
 
-  findOneById(id: string): Promise<BlogPost> {
+  findOneById(id: string): Promise<BlogPost | null> {
     return this.blogPostRepository.findOneBy({
       _id: new ObjectId(id),
     });

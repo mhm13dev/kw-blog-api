@@ -7,7 +7,7 @@ export function getConfig(): IConfig {
   return {
     core: {
       NODE_ENV: (process.env.NODE_ENV ?? 'development') as NodeEnv,
-      PORT: parseInt(process.env.PORT, 10) || 5001,
+      PORT: parseInt(process.env.PORT!, 10) || 5001,
     },
     database: {
       MONGODB: {
@@ -15,7 +15,7 @@ export function getConfig(): IConfig {
         username: process.env.MONGO_INITDB_ROOT_USERNAME,
         password: process.env.MONGO_INITDB_ROOT_PASSWORD,
         host: process.env.MONGO_HOST,
-        port: parseInt(process.env.MONGO_PORT, 10),
+        port: parseInt(process.env.MONGO_PORT!, 10),
         database: process.env.MONGO_DATABASE,
         authSource: 'admin',
         autoLoadEntities: true,
@@ -24,10 +24,10 @@ export function getConfig(): IConfig {
       },
     },
     auth: {
-      ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET,
-      ACCESS_TOKEN_EXPIRATION: process.env.ACCESS_TOKEN_EXPIRATION,
-      REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET,
-      REFRESH_TOKEN_EXPIRATION: process.env.REFRESH_TOKEN_EXPIRATION,
+      ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET!,
+      ACCESS_TOKEN_EXPIRATION: process.env.ACCESS_TOKEN_EXPIRATION!,
+      REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET!,
+      REFRESH_TOKEN_EXPIRATION: process.env.REFRESH_TOKEN_EXPIRATION!,
     },
   };
 }

@@ -59,18 +59,30 @@ export class PostCommentResolver {
 
   @ResolveField('author', () => User)
   async author(@Parent() postComment: PostComment): Promise<User> {
-    return this.userService.findOneById(postComment.author_id.toHexString());
+    const author = await this.userService.findOneById(
+      postComment.author_id.toHexString(),
+    );
+    if (!author) {
+      throw new Error('Author not found');
+    }
+    return author;
   }
 
   @ResolveField('post', () => BlogPost)
   async post(@Parent() postComment: PostComment): Promise<BlogPost> {
-    return this.blogPostService.findOneById(postComment.post_id.toHexString());
+    const post = await this.blogPostService.findOneById(
+      postComment.post_id.toHexString(),
+    );
+    if (!post) {
+      throw new Error('Post not found');
+    }
+    return post;
   }
 
   @ResolveField('reply_to_comment', () => PostComment, { nullable: true })
   async replyToComment(
     @Parent() postComment: PostComment,
-  ): Promise<PostComment> {
+  ): Promise<PostComment | null> {
     if (!postComment.reply_to_comment_id) {
       return null;
     }

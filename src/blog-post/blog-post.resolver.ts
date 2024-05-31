@@ -60,8 +60,14 @@ export class BlogPostResolver {
   }
 
   @ResolveField('author', () => User)
-  getAuthor(@Parent() post: BlogPost): Promise<User> {
-    return this.userService.findOneById(post.author_id.toHexString());
+  async getAuthor(@Parent() post: BlogPost): Promise<User> {
+    const author = await this.userService.findOneById(
+      post.author_id.toHexString(),
+    );
+    if (!author) {
+      throw new NotFoundException('Author not found');
+    }
+    return author;
   }
 
   @Mutation(() => BlogPost, {
