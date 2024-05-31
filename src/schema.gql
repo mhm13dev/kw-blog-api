@@ -132,6 +132,7 @@ input SearchInputDto {
 }
 
 type Mutation {
+  seedBulkData: Boolean!
   registerUser(input: RegisterUserInput!): User!
   loginUser(input: LoginUserInput!): LoginUserResponse!
   refreshTokens: RefreshTokensResponse!

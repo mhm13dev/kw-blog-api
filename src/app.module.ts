@@ -9,7 +9,7 @@ import { UserModule } from './user/user.module';
 import { BlogPostModule } from './blog-post/blog-post.module';
 import { PostCommentModule } from './post-comment/post-comment.module';
 import { SearchModule } from './search/search.module';
-import { AppController } from './app.controller';
+import { AppResolver } from './app.resolver';
 import { AppService } from './app.service';
 
 @Module({
@@ -30,7 +30,6 @@ import { AppService } from './app.service';
     PostCommentModule,
     SearchModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, AppResolver],
 })
 export class AppModule {}

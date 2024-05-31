@@ -53,6 +53,7 @@ export class BlogPostSubscriber implements EntitySubscriberInterface<BlogPost> {
    * It deletes the `BlogPost` and its related `PostComments` from the Elasticsearch index.
    */
   afterRemove(event: RemoveEvent<BlogPost>) {
+    if (!event.entityId) return;
     this.elasticsearchService.deleteByQuery({
       index: [ES_BLOG_POSTS_INDEX, ES_POST_COMMENTS_INDEX],
       body: {

@@ -7,7 +7,9 @@ import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { MappingTypeMapping } from '@elastic/elasticsearch/lib/api/types';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { faker } from '@faker-js/faker';
 import { UserService } from 'src/user/user.service';
+import { User } from 'src/user/entities';
 import { TokenPayload } from 'src/user/types/jwt.types';
 import { PaginationInput } from 'src/common/dto';
 import { CreateBlogPostInput, UpdateBlogPostInput } from './dto';
@@ -151,6 +153,45 @@ export class BlogPostService {
     }
     await this.blogPostRepository.remove(blogPost);
     return true;
+  }
+
+  /**
+   *  Delete all `BlogPost` from the database and Elasticsearch
+   *
+   * Intended to be used by `admin` only for seeding data.
+   *
+   * @returns `true` if all `BlogPost` are deleted successfully
+   */
+  async deleteAllBlogPosts(): Promise<boolean> {
+    await this.blogPostRepository.delete({});
+    await this.elasticsearchService.deleteByQuery({
+      index: ES_BLOG_POSTS_INDEX,
+      query: {
+        match_all: {},
+      },
+    });
+    return true;
+  }
+
+  /**
+   * Create multiple `BlogPost`
+   *
+   * Intended to be used by `admin` only for seeding data.
+   *
+   * @param count - Number of `BlogPost` to create
+   * @param users - Array of `User`
+   * @returns Array of created `BlogPost`
+   */
+  async createBulkBlogPosts(count: number, users: User[]): Promise<BlogPost[]> {
+    const blogPosts = [];
+    for (let i = 0; i < count; i++) {
+      const blogPost = new BlogPost();
+      blogPost.title = faker.lorem.sentence();
+      blogPost.content = faker.lorem.paragraphs();
+      blogPost.author = users[Math.floor(Math.random() * users.length)];
+      blogPosts.push(await this.blogPostRepository.save(blogPost));
+    }
+    return blogPosts;
   }
 
   /**

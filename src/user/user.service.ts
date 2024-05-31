@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { instanceToPlain } from 'class-transformer';
 import { v4 as uuidV4 } from 'uuid';
 import { AppConfigService } from 'src/config/config.service';
@@ -252,5 +252,39 @@ export class UserService {
    */
   findOneById(id: string): Promise<User | null> {
     return this.userRepository.findOneBy({ id });
+  }
+
+  /**
+   * Deletes all the `User` except the `admin`.
+   *
+   * Intended to be used by `admin` for seeding the database.
+   *
+   * @returns `void`
+   */
+  async deleteAllUsersExceptAdmin(): Promise<void> {
+    await this.userRepository.delete({
+      role: Not(UserRole.admin),
+    });
+  }
+
+  /**
+   * Create multiple `User`.
+   *
+   * Intended to be used by `admin` for seeding the database.
+   *
+   * @param count - Number of `User` to create
+   * @returns Array of created `User`
+   */
+  createBulkUsers(count: number): Promise<User[]> {
+    const users = [];
+    for (let i = 0; i < count; i++) {
+      const user = new User();
+      user.email = `user${i + 1}@kwanso.com`;
+      user.name = `user${i + 1}`;
+      user.password = '12345678';
+      user.role = UserRole.user;
+      users.push(user);
+    }
+    return this.userRepository.save(users);
   }
 }

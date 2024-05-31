@@ -8,9 +8,12 @@ import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { MappingTypeMapping } from '@elastic/elasticsearch/lib/api/types';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { TokenPayload } from 'src/user/types/jwt.types';
+import { faker } from '@faker-js/faker';
 import { BlogPostService } from 'src/blog-post/blog-post.service';
+import { BlogPost } from 'src/blog-post/entities';
 import { UserService } from 'src/user/user.service';
+import { User } from 'src/user/entities';
+import { TokenPayload } from 'src/user/types/jwt.types';
 import { CreatePostCommentInput, GetPostCommentsInput } from './dto';
 import { ES_POST_COMMENTS_INDEX } from './constants';
 import { PostComment } from './entities';
@@ -139,6 +142,58 @@ export class PostCommentService {
     return this.postCommentRepository.findOneBy({
       id,
     });
+  }
+
+  /**
+   * Delete all `PostComment` from the database and Elasticsearch
+   *
+   * Intended to be used by `admin` only for seeding data.
+   *
+   * @returns `true` if all `PostComment` are deleted successfully
+   */
+  async deleteAllPostComments(): Promise<boolean> {
+    await this.postCommentRepository.delete({});
+    await this.elasticsearchService.deleteByQuery({
+      index: ES_POST_COMMENTS_INDEX,
+      query: {
+        match_all: {},
+      },
+    });
+    return true;
+  }
+
+  /**
+   * Create multiple `PostComment` data
+   *
+   * Intended to be used by `admin` only for seeding data.
+   *
+   * @param count - Number of `PostComment` to create
+   * @param users - Array of `User`
+   * @param blogPosts - Array of `BlogPost`
+   * @returns Array of created `PostComment`
+   */
+  async createBulkPostComments(
+    count: number,
+    users: User[],
+    blogPosts: BlogPost[],
+  ): Promise<PostComment[]> {
+    const postComments: PostComment[] = [];
+    for (let i = 0; i < count; i++) {
+      const postComment = new PostComment();
+      postComment.id = faker.string.uuid();
+      postComment.content = faker.lorem.paragraph();
+      postComment.author = users[Math.floor(Math.random() * users.length)];
+      if (Math.random() > 0.5 && postComments.length > 0) {
+        postComment.parent_comment =
+          postComments[Math.floor(Math.random() * postComments.length)];
+        postComment.post = postComment.parent_comment.post;
+      } else {
+        postComment.post =
+          blogPosts[Math.floor(Math.random() * blogPosts.length)];
+      }
+      postComments.push(await this.postCommentRepository.save(postComment));
+    }
+    return postComments;
   }
 
   /**

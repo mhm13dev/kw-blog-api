@@ -42,6 +42,7 @@ export class PostCommentSubscriber
    * It will delete the `PostComment` and all it's children recursively from the Elasticsearch index.
    */
   afterRemove(event: RemoveEvent<PostComment>) {
+    if (!event.entityId) return;
     this.deleteNestedPostComments([event.entityId]);
   }
 

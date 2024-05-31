@@ -16,6 +16,7 @@ import { PostComment } from './entities';
     ElasticsearchModule,
   ],
   providers: [PostCommentResolver, PostCommentService, PostCommentSubscriber],
+  exports: [PostCommentService],
 })
 export class PostCommentModule implements OnModuleInit {
   constructor(private readonly postCommentService: PostCommentService) {}
