@@ -7,6 +7,8 @@ import { UserService } from './user.service';
 
 /**
  * Resolver for `User` entity
+ *
+ * This resolver is responsible for handling all the queries and mutations related to the `User` entity.
  */
 @Resolver(() => User)
 export class UserResolver {
@@ -17,7 +19,6 @@ export class UserResolver {
    * @param userId - ID of the user
    * @returns `User` object of the currently logged in user
    * @throws `NotFoundException` If the user is not found
-   * @throws `UnauthorizedException` If the user is not authenticated
    */
   @Query(() => User)
   @UseGuards(GqlAccessTokenGuard)

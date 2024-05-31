@@ -27,7 +27,7 @@ export class UserService {
   /**
    * Finds a `User` by email
    * @param email - Email of the `User`
-   * @returns `User` if found, otherwise `null`
+   * @returns `User` if found, `null` otherwise
    */
   findOneByEmail(email: string): Promise<User | null> {
     return this.userRepository.findOneBy({
@@ -38,7 +38,7 @@ export class UserService {
   /**
    * Finds a `User` by id
    * @param id - ID of the `User`
-   * @returns `User` if found, otherwise `null`
+   * @returns `User` if found, `null` otherwise
    */
   findOneById(id: string): Promise<User | null> {
     return this.userRepository.findOneBy({ _id: new ObjectId(id) });
