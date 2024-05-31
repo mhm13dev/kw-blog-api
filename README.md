@@ -22,11 +22,11 @@ To create a user with the role of `admin`, you need to run database migration.
 
 ## Database Migration
 
-Make sure you have populated `.env.migrations` file with the necessary environment variables. You can use the `.env.example.migrations` file as a template.
+Make sure you have populated `.env.migrations` file with the necessary environment variables. You can use the `.env.migrations.example` file as a template.
 
 ```bash
-# Copy the .env.example.migrations file to .env.migrations
-cp .env.example.migrations .env.migrations
+# Copy the .env.migrations.example file to .env.migrations
+cp .env.migrations.example .env.migrations
 ```
 
 For running the database migration, you need to have a MongoDB instance running. You can use the following command to run a MongoDB instance using Docker Compose.
