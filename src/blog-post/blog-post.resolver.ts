@@ -12,6 +12,7 @@ import { CurrentUserPayload } from 'src/auth/decorators';
 import { TokenPayload } from 'src/auth/types/jwt.types';
 import { UserService } from 'src/user/user.service';
 import { User } from 'src/user/entities';
+import { ObjectIdDto } from 'src/common/dto';
 import {
   CreateBlogPostInput,
   GetAllBlogPostsInput,
@@ -79,5 +80,20 @@ export class BlogPostResolver {
       currentUserPayload,
       updateBlogPostInput,
     );
+  }
+
+  @Mutation(() => Boolean, {
+    name: 'deletePost',
+  })
+  @UseGuards(GqlAccessTokenGuard)
+  async deleteBlogPost(
+    @CurrentUserPayload() currentUserPayload: TokenPayload,
+    @Args('deleteBlogPostInput') deleteBlogPostInput: ObjectIdDto,
+  ): Promise<boolean> {
+    await this.blogPostService.deleteBlogPost(
+      currentUserPayload,
+      deleteBlogPostInput._id,
+    );
+    return true;
   }
 }

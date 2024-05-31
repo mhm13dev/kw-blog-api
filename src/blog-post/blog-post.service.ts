@@ -69,4 +69,20 @@ export class BlogPostService {
 
     return this.blogPostRepository.save(updatedBlogPost);
   }
+
+  async deleteBlogPost(
+    currentUserPayload: TokenPayload,
+    _id: string,
+  ): Promise<void> {
+    const blogPost = await this.blogPostRepository.findOneBy({
+      _id: new ObjectId(_id),
+      author_id: new ObjectId(currentUserPayload.sub),
+    });
+
+    if (!blogPost) {
+      throw new ForbiddenException('You are not allowed to delete this post');
+    }
+
+    await this.blogPostRepository.delete(blogPost);
+  }
 }

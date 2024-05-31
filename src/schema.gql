@@ -66,6 +66,7 @@ type Mutation {
   logout: Boolean!
   createPost(createBlogPostInput: CreateBlogPostInput!): BlogPost!
   updatePost(updateBlogPostInput: UpdateBlogPostInput!): BlogPost!
+  deletePost(deleteBlogPostInput: ObjectIdDto!): Boolean!
 }
 
 input RegisterUserInput {
@@ -87,5 +88,9 @@ input CreateBlogPostInput {
 input UpdateBlogPostInput {
   title: String
   content: String
+  _id: String!
+}
+
+input ObjectIdDto {
   _id: String!
 }
