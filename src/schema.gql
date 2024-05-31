@@ -44,6 +44,18 @@ type BlogPost {
 
 type Query {
   me: User!
+  posts(getBlogPostInput: GetBlogPostInput): [BlogPost!]!
+}
+
+input GetBlogPostInput {
+  limit: Int = 10
+  offset: Int = 0
+  sort: SortOrder = DESC
+}
+
+enum SortOrder {
+  ASC
+  DESC
 }
 
 type Mutation {
