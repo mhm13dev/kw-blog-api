@@ -9,7 +9,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Transform } from 'class-transformer';
-import { MaxLength } from 'class-validator';
+import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
 import { User } from 'src/user/entities';
 
 /**
@@ -42,9 +42,10 @@ export class BlogPost {
   title: string;
 
   @Field(() => String)
-  @Column()
+  @Column('text')
+  @IsString()
+  @IsNotEmpty()
   @Transform(({ value }) => value?.toString().trim())
-  @MaxLength(1000)
   content: string;
 
   @Field()

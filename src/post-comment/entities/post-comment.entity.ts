@@ -70,7 +70,7 @@ export class PostComment {
   parent_comment?: PostComment;
 
   @Field(() => String)
-  @Column()
+  @Column('text')
   @IsString()
   @IsNotEmpty()
   @Transform(({ value }) => value?.toString()?.trim())
