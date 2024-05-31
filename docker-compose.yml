@@ -3,7 +3,7 @@ services:
     image: node:20-alpine
     working_dir: /app
     ports:
-      - 3000:3000
+      - ${PORT}:${PORT}
     volumes:
       - .:/app
     depends_on:
@@ -12,7 +12,7 @@ services:
   mongodb:
     image: mongo
     ports:
-      - '27017:27017'
+      - 27017:27017
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
