@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, OnModuleInit } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from 'src/user/user.module';
 import { ElasticsearchModule } from 'src/elasticsearch/elasticsearch.module';
@@ -15,4 +15,10 @@ import { BlogPostResolver } from './blog-post.resolver';
   providers: [BlogPostResolver, BlogPostService],
   exports: [BlogPostService],
 })
-export class BlogPostModule {}
+export class BlogPostModule implements OnModuleInit {
+  constructor(private readonly blogPostService: BlogPostService) {}
+
+  async onModuleInit(): Promise<void> {
+    await this.blogPostService.createBlogPostsIndexIfNotExists();
+  }
+}

@@ -23,9 +23,7 @@ export class BlogPostService {
     private blogPostRepository: Repository<BlogPost>,
     private readonly userService: UserService,
     private readonly elasticsearchService: ElasticsearchService,
-  ) {
-    this.createBlogPostsIndexIfNotExists();
-  }
+  ) {}
 
   /**
    * Create the Elasticsearch index for `BlogPost` if it doesn't exist
