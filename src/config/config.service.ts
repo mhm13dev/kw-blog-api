@@ -17,4 +17,8 @@ export class ConfigService {
   get database(): IConfig['database'] {
     return this.config.database;
   }
+
+  get auth(): IConfig['auth'] {
+    return this.config.auth;
+  }
 }

@@ -1,15 +1,29 @@
+import { InjectRepository } from '@nestjs/typeorm';
 import {
   BadRequestException,
   ForbiddenException,
   Injectable,
 } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { Repository } from 'typeorm';
+import { ObjectId } from 'mongodb';
+import { instanceToPlain } from 'class-transformer';
 import { User } from 'src/user/user.entity';
 import { UserService } from 'src/user/user.service';
+import { ConfigService } from 'src/config/config.service';
+import { UserSession } from './entities/user-session.entity';
+import { TokenPayload, TokensPair } from './types/jwt.types';
 import { LoginUserInput, LoginUserResponse, RegisterUserInput } from './dto';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
+    @InjectRepository(UserSession)
+    private readonly userSessionRepository: Repository<UserSession>,
+  ) {}
 
   async registerUser(registerUserInput: RegisterUserInput): Promise<User> {
     // Check if passwords match
@@ -31,19 +45,58 @@ export class AuthService {
   }
 
   async loginUser(loginUserInput: LoginUserInput): Promise<LoginUserResponse> {
+    // Check if user exist
     const user = await this.userService.findOneByEmail(loginUserInput.email);
 
     if (!user) {
       throw new BadRequestException('Invalid credentials');
     }
 
+    // Check if passwords match
     if (!(await user.comparePassword(loginUserInput.password))) {
       throw new BadRequestException('Invalid credentials');
     }
 
+    const tokenPayload = new TokenPayload({
+      sub: user._id.toHexString(),
+      session_id: new ObjectId().toHexString(),
+    });
+
+    // Generate JWT Tokens
+    const tokensPair = await this.generateTokensPair(tokenPayload);
+
+    // Create User Session
+    await this.createSession(tokenPayload, tokensPair.refresh_token);
+
     return new LoginUserResponse({
       user,
-      token: 'jwt token',
+      access_token: tokensPair.access_token,
+      refresh_token: tokensPair.refresh_token,
     });
+  }
+
+  private async generateTokensPair(payload: TokenPayload): Promise<TokensPair> {
+    return new TokensPair({
+      access_token: await this.jwtService.signAsync(instanceToPlain(payload), {
+        secret: this.configService.auth.ACCESS_TOKEN_SECRET,
+        expiresIn: this.configService.auth.ACCESS_TOKEN_EXPIRATION,
+      }),
+      refresh_token: await this.jwtService.signAsync(instanceToPlain(payload), {
+        secret: this.configService.auth.REFRESH_TOKEN_SECRET,
+        expiresIn: this.configService.auth.REFRESH_TOKEN_EXPIRATION,
+      }),
+    });
+  }
+
+  private async createSession(
+    tokenPayload: TokenPayload,
+    refreshToken: string,
+  ): Promise<void> {
+    const userSession = this.userSessionRepository.create({
+      _id: new ObjectId(tokenPayload.session_id),
+      user_id: new ObjectId(tokenPayload.sub),
+      refresh_token: refreshToken,
+    });
+    await this.userSessionRepository.save(userSession);
   }
 }

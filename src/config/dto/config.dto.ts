@@ -31,4 +31,21 @@ export class ConfigDto {
   @IsNotEmpty()
   @IsString()
   MONGO_DATABASE: string;
+
+  // AUTH
+  @IsNotEmpty()
+  @IsString()
+  ACCESS_TOKEN_SECRET: string;
+
+  @IsNotEmpty()
+  @IsString()
+  ACCESS_TOKEN_EXPIRATION: string;
+
+  @IsNotEmpty()
+  @IsString()
+  REFRESH_TOKEN_SECRET: string;
+
+  @IsNotEmpty()
+  @IsString()
+  REFRESH_TOKEN_EXPIRATION: string;
 }
