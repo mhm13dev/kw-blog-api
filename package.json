@@ -21,8 +21,7 @@
     "docker:start:dev": "docker compose -f docker-compose.yml up -d",
     "docker:stop:dev": "docker compose -f docker-compose.yml down",
     "docker:start:seeder": "docker compose -f docker-compose.seeder.yml up -d",
-    "docker:stop:seeder": "docker compose -f docker-compose.seeder.yml down",
-    "seeder:create:admin": "nest start --entryFile ./seeds/create-admin.seed.js"
+    "docker:stop:seeder": "docker compose -f docker-compose.seeder.yml down"
   },
   "dependencies": {
     "@apollo/server": "^4.10.4",
