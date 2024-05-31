@@ -93,7 +93,7 @@ export class AuthService {
 
     // Generate JWT Tokens
     const tokenPayload = new TokenPayload({
-      sub: user._id.toHexString(),
+      sub: user.id,
       role: user.role,
       session_id: new ObjectId().toHexString(),
     });

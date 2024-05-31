@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ObjectId } from 'mongodb';
 import { User, UserRole } from './entities';
 
 /**
@@ -41,7 +40,7 @@ export class UserService {
    * @returns `User` if found, `null` otherwise
    */
   findOneById(id: string): Promise<User | null> {
-    return this.userRepository.findOneBy({ _id: new ObjectId(id) });
+    return this.userRepository.findOneBy({ id });
   }
 
   /**

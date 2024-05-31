@@ -2,15 +2,14 @@ import { ObjectType, Field, ID, registerEnumType } from '@nestjs/graphql';
 import {
   Column,
   Entity,
-  ObjectId,
-  ObjectIdColumn,
   CreateDateColumn,
   UpdateDateColumn,
   BeforeInsert,
   BeforeUpdate,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Transform } from 'class-transformer';
-import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
+import { IsEmail, IsNotEmpty } from 'class-validator';
 import * as argon2 from 'argon2';
 
 export enum UserRole {
@@ -26,13 +25,11 @@ registerEnumType(UserRole, {
  * `User` entity for the Database and GraphQL Schema
  */
 @ObjectType()
-@Entity({
-  name: 'users',
-})
+@Entity()
 export class User {
   @Field(() => ID)
-  @ObjectIdColumn()
-  _id: ObjectId;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Field()
   @Column({
@@ -44,8 +41,6 @@ export class User {
   email: string;
 
   @Column()
-  @MinLength(8)
-  @IsNotEmpty()
   password: string;
 
   @Field()
@@ -69,12 +64,12 @@ export class User {
   role: UserRole;
 
   @Field()
-  @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
   @Field()
   @UpdateDateColumn({
-    type: 'timestamp',
+    type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
     onUpdate: 'CURRENT_TIMESTAMP',
   })

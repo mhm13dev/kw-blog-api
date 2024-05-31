@@ -3,7 +3,7 @@
 # ------------------------------------------------------
 
 type User {
-  _id: ID!
+  id: ID!
   email: String!
   name: String!
   role: UserRole!
@@ -44,82 +44,6 @@ type PostComment {
   updatedAt: DateTime!
 }
 
-type LoginUserResponse {
-  access_token: String!
-  refresh_token: String!
-  user: User!
-}
-
-type RefreshTokensResponse {
-  access_token: String!
-  refresh_token: String!
-}
-
 type Query {
   me: User!
-  posts(input: PaginationInput): [BlogPost!]!
-  post(input: ObjectIdDto!): BlogPost!
-  comments(input: GetPostCommentsInput!): [PostComment!]!
-}
-
-input PaginationInput {
-  limit: Int = 10
-  offset: Int = 0
-  sort: SortOrder = DESC
-}
-
-enum SortOrder {
-  ASC
-  DESC
-}
-
-input ObjectIdDto {
-  _id: String!
-}
-
-input GetPostCommentsInput {
-  limit: Int = 10
-  offset: Int = 0
-  sort: SortOrder = DESC
-  post_id: String!
-}
-
-type Mutation {
-  registerUser(input: RegisterUserInput!): User!
-  loginUser(input: LoginUserInput!): LoginUserResponse!
-  refreshTokens: RefreshTokensResponse!
-  logout: Boolean!
-  createPost(input: CreateBlogPostInput!): BlogPost!
-  updatePost(input: UpdateBlogPostInput!): BlogPost!
-  deletePost(input: ObjectIdDto!): Boolean!
-  createPostComment(input: CreatePostCommentInput!): PostComment!
-  deletePostComment(input: ObjectIdDto!): Boolean!
-}
-
-input RegisterUserInput {
-  email: String!
-  password: String!
-  confirm_password: String!
-}
-
-input LoginUserInput {
-  email: String!
-  password: String!
-}
-
-input CreateBlogPostInput {
-  title: String!
-  content: String!
-}
-
-input UpdateBlogPostInput {
-  title: String
-  content: String
-  _id: String!
-}
-
-input CreatePostCommentInput {
-  post_id: String
-  reply_to_comment_id: String
-  content: String!
 }

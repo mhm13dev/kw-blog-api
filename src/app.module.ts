@@ -6,9 +6,9 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { AppConfigModule } from './config/config.module';
 import { AppConfigService } from './config/config.service';
 import { UserModule } from './user/user.module';
-import { AuthModule } from './auth/auth.module';
-import { BlogPostModule } from './blog-post/blog-post.module';
-import { PostCommentModule } from './post-comment/post-comment.module';
+// import { AuthModule } from './auth/auth.module';
+// import { BlogPostModule } from './blog-post/blog-post.module';
+// import { PostCommentModule } from './post-comment/post-comment.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -26,9 +26,9 @@ import { AppService } from './app.service';
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
     }),
     UserModule,
-    AuthModule,
-    BlogPostModule,
-    PostCommentModule,
+    // AuthModule,
+    // BlogPostModule,
+    // PostCommentModule,
   ],
   controllers: [AppController],
   providers: [AppService],
