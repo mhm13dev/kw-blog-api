@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty, IsNumber } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { NodeEnv } from '../types/common.enum';
 
 export class ConfigDto {
@@ -10,4 +10,25 @@ export class ConfigDto {
   @IsNotEmpty()
   @IsNumber()
   PORT: number;
+
+  // Database
+  @IsNotEmpty()
+  @IsString()
+  MONGO_INITDB_ROOT_USERNAME: string;
+
+  @IsNotEmpty()
+  @IsString()
+  MONGO_INITDB_ROOT_PASSWORD: string;
+
+  @IsNotEmpty()
+  @IsString()
+  MONGO_HOST: string;
+
+  @IsNotEmpty()
+  @IsNumber()
+  MONGO_PORT: number;
+
+  @IsNotEmpty()
+  @IsString()
+  MONGO_DATABASE: string;
 }

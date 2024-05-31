@@ -13,4 +13,8 @@ export class ConfigService {
   get core(): IConfig['core'] {
     return this.config.core;
   }
+
+  get database(): IConfig['database'] {
+    return this.config.database;
+  }
 }
