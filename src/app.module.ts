@@ -8,6 +8,7 @@ import { AppConfigService } from './config/config.service';
 import { UserModule } from './user/user.module';
 import { BlogPostModule } from './blog-post/blog-post.module';
 import { PostCommentModule } from './post-comment/post-comment.module';
+import { SearchModule } from './search/search.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -27,6 +28,7 @@ import { AppService } from './app.service';
     UserModule,
     BlogPostModule,
     PostCommentModule,
+    SearchModule,
   ],
   controllers: [AppController],
   providers: [AppService],
