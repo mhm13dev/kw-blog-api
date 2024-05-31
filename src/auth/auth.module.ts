@@ -5,9 +5,15 @@ import { UserModule } from 'src/user/user.module';
 import { UserSession } from './entities';
 import { AuthService } from './auth.service';
 import { AuthResolver } from './auth.resolver';
+import { AccessTokenStrategy, RefreshTokenStrategy } from './strategies';
 
 @Module({
-  providers: [AuthResolver, AuthService],
+  providers: [
+    AuthResolver,
+    AuthService,
+    AccessTokenStrategy,
+    RefreshTokenStrategy,
+  ],
   imports: [
     UserModule,
     JwtModule.register({}),
