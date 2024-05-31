@@ -1,15 +1,27 @@
-import { Resolver, Mutation, Args, Query } from '@nestjs/graphql';
+import {
+  Resolver,
+  Mutation,
+  Args,
+  Query,
+  ResolveField,
+  Parent,
+} from '@nestjs/graphql';
 import { NotFoundException, UseGuards } from '@nestjs/common';
 import { GqlAccessTokenGuard } from 'src/auth/guards';
 import { CurrentUserPayload } from 'src/auth/decorators';
 import { TokenPayload } from 'src/auth/types/jwt.types';
+import { UserService } from 'src/user/user.service';
+import { User } from 'src/user/entities';
 import { CreateBlogPostInput, GetAllBlogPostsInput } from './dto';
 import { BlogPost } from './entities';
 import { BlogPostService } from './blog-post.service';
 
 @Resolver(() => BlogPost)
 export class BlogPostResolver {
-  constructor(private readonly blogPostService: BlogPostService) {}
+  constructor(
+    private readonly blogPostService: BlogPostService,
+    private readonly userService: UserService,
+  ) {}
 
   @Mutation(() => BlogPost, {
     name: 'createPost',
@@ -44,5 +56,10 @@ export class BlogPostResolver {
       throw new NotFoundException('Post not found');
     }
     return post;
+  }
+
+  @ResolveField('author', () => User)
+  getAuthor(@Parent() post: BlogPost): Promise<User> {
+    return this.userService.findOneById(post.author_id.toHexString());
   }
 }

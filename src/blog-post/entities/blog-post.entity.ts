@@ -9,6 +9,7 @@ import {
 import { ObjectId } from 'mongodb';
 import { Transform } from 'class-transformer';
 import { MaxLength } from 'class-validator';
+import { User } from 'src/user/entities';
 
 @ObjectType()
 @Entity({
@@ -22,6 +23,9 @@ export class BlogPost {
   @Field(() => String)
   @Column()
   author_id: ObjectId;
+
+  @Field(() => User)
+  author: User;
 
   @Field(() => String)
   @Column()

@@ -35,6 +35,7 @@ type RefreshTokensResponse {
 type BlogPost {
   _id: ID!
   author_id: String!
+  author: User!
   title: String!
   content: String!
   createdAt: DateTime!
