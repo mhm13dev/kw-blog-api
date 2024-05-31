@@ -84,7 +84,7 @@ npm run docker:stop:migrations
 cp .env.example .env
 ```
 
-## Running the
+## Running the app
 
 💥 Make sure to run the migrations if you are running the project for the first time. You will have to re-run the migrations whenever there are changes to entities.
 
