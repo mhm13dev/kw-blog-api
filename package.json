@@ -20,8 +20,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "docker:start:dev": "docker compose -f docker-compose.yml up -d",
     "docker:stop:dev": "docker compose -f docker-compose.yml down",
-    "docker:start:seeder": "docker compose -f docker-compose.seeder.yml up -d",
-    "docker:stop:seeder": "docker compose -f docker-compose.seeder.yml down"
+    "docker:start:migrations": "docker compose -f docker-compose.migrations.yml up -d",
+    "docker:stop:migrations": "docker compose -f docker-compose.migrations.yml down"
   },
   "dependencies": {
     "@apollo/server": "^4.10.4",
