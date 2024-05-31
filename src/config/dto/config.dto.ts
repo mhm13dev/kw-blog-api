@@ -51,4 +51,21 @@ export class ConfigDto {
   @IsNotEmpty()
   @IsString()
   REFRESH_TOKEN_EXPIRATION: string;
+
+  // Elastic Search
+  @IsNotEmpty()
+  @IsString()
+  ELASTIC_SEARCH_HOST: string;
+
+  @IsNotEmpty()
+  @IsNumber()
+  ELASTIC_SEARCH_PORT: number;
+
+  @IsNotEmpty()
+  @IsString()
+  ELASTIC_SEARCH_API_KEY_ID: string;
+
+  @IsNotEmpty()
+  @IsString()
+  ELASTIC_SEARCH_API_KEY: string;
 }

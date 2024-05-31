@@ -55,11 +55,37 @@ type PostComment {
   updated_at: DateTime!
 }
 
+type SearchUserResponse {
+  id: ID!
+  name: String!
+}
+
+type SearchPostResponse {
+  id: ID!
+  title: String!
+  content: String!
+  author: SearchUserResponse!
+}
+
+type SearchCommentResponse {
+  id: ID!
+  content: String!
+  author: SearchUserResponse!
+  post_id: String!
+  parent_comment_id: String
+}
+
+type SearchResponseDto {
+  posts: [SearchPostResponse!]!
+  comments: [SearchCommentResponse!]!
+}
+
 type Query {
   me: User!
   posts(input: PaginationInput): [BlogPost!]!
   post(input: UUIDDTO!): BlogPost!
   comments(input: GetPostCommentsInput!): [PostComment!]!
+  search(input: SearchInputDto!): SearchResponseDto!
 }
 
 input PaginationInput {
@@ -82,6 +108,10 @@ input GetPostCommentsInput {
   offset: Int = 0
   sort: SortOrder = DESC
   post_id: String!
+}
+
+input SearchInputDto {
+  query: String!
 }
 
 type Mutation {
