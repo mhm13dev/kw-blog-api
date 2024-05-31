@@ -7,6 +7,8 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Transform } from 'class-transformer';
+import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
 
 @ObjectType()
 @Entity({
@@ -17,7 +19,21 @@ export class User {
   @ObjectIdColumn()
   _id: ObjectId;
 
-  @Field({ description: 'Name of the user' })
+  @Field()
+  @Column({
+    unique: true,
+  })
+  @IsEmail()
+  @IsNotEmpty()
+  @Transform(({ value }) => value?.toLowerCase().trim())
+  email: string;
+
+  @Column()
+  @MinLength(8)
+  @IsNotEmpty()
+  password: string;
+
+  @Field()
   @Column()
   name: string;
 

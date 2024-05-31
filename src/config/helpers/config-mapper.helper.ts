@@ -17,6 +17,7 @@ export function getConfig(): IConfig {
         database: process.env.MONGO_DATABASE,
         authSource: 'admin',
         autoLoadEntities: true,
+        synchronize: process.env.NODE_ENV !== 'production',
       },
     },
   };

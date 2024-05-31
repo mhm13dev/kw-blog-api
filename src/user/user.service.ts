@@ -14,7 +14,9 @@ export class UserService {
 
   async create(createUserInput: CreateUserInput) {
     const user = this.userRepository.create({
-      name: createUserInput.name,
+      name: createUserInput.email.split('@')[0],
+      email: createUserInput.email,
+      password: createUserInput.password, // TODO: hash password
     });
     return this.userRepository.save(user);
   }
