@@ -55,6 +55,15 @@ npx migrate-mongo status
 npm run docker:stop:migrations
 ```
 
+## Environment Variables
+
+Make sure you have populated the `.env` file with the necessary environment variables. You can use the `.env.example` file as a template.
+
+```bash
+# Copy the .env.example file to .env
+cp .env.example .env
+```
+
 ## Running the app
 
 ```bash
