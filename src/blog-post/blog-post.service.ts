@@ -73,13 +73,15 @@ export class BlogPostService {
   ): Promise<void> {
     const blogPost = await this.blogPostRepository.findOneBy({
       _id: new ObjectId(_id),
-      author_id: new ObjectId(currentUserPayload.sub),
     });
-
     if (!blogPost) {
       throw new ForbiddenException('You are not allowed to delete this post');
     }
+    if (!blogPost.author_id.equals(new ObjectId(currentUserPayload.sub))) {
+      throw new ForbiddenException('You are not the author of this post');
+    }
 
-    await this.blogPostRepository.delete(blogPost);
+    // INFO: all the associated comments will be removed by the BlogPostSubscriber
+    await this.blogPostRepository.remove(blogPost);
   }
 }
