@@ -63,7 +63,7 @@ type Mutation {
   loginUser(loginUserInput: LoginUserInput!): LoginUserResponse!
   refreshTokens: RefreshTokensResponse!
   logout: Boolean!
-  createBlogPost(createBlogPostInput: CreateBlogPostInput!): BlogPost!
+  createPost(createBlogPostInput: CreateBlogPostInput!): BlogPost!
 }
 
 input RegisterUserInput {

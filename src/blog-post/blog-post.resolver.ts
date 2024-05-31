@@ -11,7 +11,9 @@ import { BlogPostService } from './blog-post.service';
 export class BlogPostResolver {
   constructor(private readonly blogPostService: BlogPostService) {}
 
-  @Mutation(() => BlogPost)
+  @Mutation(() => BlogPost, {
+    name: 'createPost',
+  })
   @UseGuards(GqlAccessTokenGuard)
   createBlogPost(
     @CurrentUserPayload() currentUserPayload: TokenPayload,
