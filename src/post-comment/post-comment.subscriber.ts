@@ -8,6 +8,9 @@ import {
 import { ES_POST_COMMENTS_INDEX } from './constants';
 import { PostComment } from './entities';
 
+/**
+ * Subscribes to `PostComment` entity events.
+ */
 @EventSubscriber()
 export class PostCommentSubscriber
   implements EntitySubscriberInterface<PostComment>
@@ -23,18 +26,23 @@ export class PostCommentSubscriber
     return PostComment;
   }
 
+  /**
+   * This method is called before the `PostComment` entity is removed.
+   *
+   * It will delete the `PostComment` and all it's children recursively from the Elasticsearch index.
+   */
   async afterRemove(event: RemoveEvent<PostComment>) {
     await this.deleteNestedPostComments([event.entityId]);
   }
 
   /**
-   * Delete all the nested PostComments of the deleted PostComment upto N levels
+   * Delete `PostComment` and all it's children upto N levels
    * @param postCommentIdsToDelete - List of PostComment IDs to delete
    */
   private async deleteNestedPostComments(
     postCommentIdsToDelete: string[],
   ): Promise<void> {
-    // Delete the PostComments from elasticsearch
+    // Delete the `PostComments` from elasticsearch
     await this.elasticsearchService.deleteByQuery({
       index: [ES_POST_COMMENTS_INDEX],
       body: {
@@ -46,7 +54,7 @@ export class PostCommentSubscriber
       },
     });
 
-    // Get all the PostComments which have the match the parent comment ID
+    // Get all the `PostComments` which have the matching parent_comment_id
     const postComments = await this.elasticsearchService.search({
       index: ES_POST_COMMENTS_INDEX,
       body: {
@@ -59,12 +67,12 @@ export class PostCommentSubscriber
       },
     });
 
-    // Get the comment IDs from the search result
+    // Get the IDs from the search result
     postCommentIdsToDelete = postComments.hits.hits.map(
       (comment) => comment._id,
     );
 
-    // Recursively delete the nested PostComments
+    // Recursively delete the nested `PostComments`
     if (postCommentIdsToDelete.length > 0) {
       await this.deleteNestedPostComments(postCommentIdsToDelete);
     }

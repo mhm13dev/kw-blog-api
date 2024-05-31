@@ -10,10 +10,20 @@ import {
   SearchResponseDto,
 } from './dto';
 
+/**
+ * Service for searching `BlogPosts` and `PostComments` using the Elasticsearch.
+ */
 @Injectable()
 export class SearchService {
   constructor(private readonly elasticsearchService: ElasticsearchService) {}
 
+  /**
+   * Open a new `Point in Time` (PIT) in Elasticsearch.
+   *
+   * PIT is used to search the data in the same state as it was when the PIT was opened. It avoids the data changes during the search with pagination.
+   *
+   * @returns Object containing the `pid_id` of the opened PIT
+   */
   async openPIT(): Promise<{
     pid_id: string;
   }> {
@@ -27,6 +37,16 @@ export class SearchService {
     };
   }
 
+  /**
+   * Search `BlogPosts` and `PostComments`.
+   *
+   * It uses `multi_match` query to search the `query` in the `title`, `content`, and `author.name` fields from `blog_posts` and `post_comments` indices.
+   *
+   * We are paginating the search results using the `size`, `search_after` and `pit_id` parameters.
+   *
+   * @param input - Input data to search `BlogPosts` and `PostComments`
+   * @returns Search Response
+   */
   async search({
     query,
     pit_id,
