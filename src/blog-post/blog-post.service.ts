@@ -26,35 +26,6 @@ export class BlogPostService {
   ) {}
 
   /**
-   * Create the Elasticsearch index for `BlogPost` if it doesn't exist
-   */
-  async createBlogPostsIndexIfNotExists(): Promise<void> {
-    const indexExists = await this.elasticsearchService.indices.exists({
-      index: ES_BLOG_POSTS_INDEX,
-    });
-
-    if (!indexExists) {
-      await this.elasticsearchService.indices.create({
-        index: ES_BLOG_POSTS_INDEX,
-        body: {
-          mappings: {
-            properties: {
-              title: { type: 'text' },
-              content: { type: 'text' },
-              author: {
-                properties: {
-                  id: { type: 'keyword' },
-                  name: { type: 'text' },
-                },
-              },
-            },
-          },
-        },
-      });
-    }
-  }
-
-  /**
    * Creates a new `BlogPost` and Index it in Elasticsearch
    * @param currentUserPayload - Logged in `User` payload
    * @param input - Input data to create a new `BlogPost`
@@ -79,7 +50,7 @@ export class BlogPostService {
     const savedBlogPost = await this.blogPostRepository.save(blogPost);
 
     // Index the blog post in Elasticsearch
-    await this.indexBlogPost(savedBlogPost);
+    this.indexBlogPost(savedBlogPost);
 
     return savedBlogPost;
   }
@@ -189,6 +160,35 @@ export class BlogPostService {
     await this.blogPostRepository.remove(blogPost);
     this.removeBlogPostFromIndex(id);
     return true;
+  }
+
+  /**
+   * Create the Elasticsearch index for `BlogPost` if it doesn't exist
+   */
+  async createBlogPostsIndexIfNotExists(): Promise<void> {
+    const indexExists = await this.elasticsearchService.indices.exists({
+      index: ES_BLOG_POSTS_INDEX,
+    });
+
+    if (!indexExists) {
+      await this.elasticsearchService.indices.create({
+        index: ES_BLOG_POSTS_INDEX,
+        body: {
+          mappings: {
+            properties: {
+              title: { type: 'text' },
+              content: { type: 'text' },
+              author: {
+                properties: {
+                  id: { type: 'keyword' },
+                  name: { type: 'text' },
+                },
+              },
+            },
+          },
+        },
+      });
+    }
   }
 
   /**
