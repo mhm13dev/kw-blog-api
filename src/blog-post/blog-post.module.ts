@@ -6,8 +6,8 @@ import { BlogPostService } from './blog-post.service';
 import { BlogPostResolver } from './blog-post.resolver';
 
 @Module({
-  providers: [BlogPostResolver, BlogPostService],
   imports: [TypeOrmModule.forFeature([BlogPost]), UserModule],
+  providers: [BlogPostResolver, BlogPostService],
   exports: [BlogPostService],
 })
 export class BlogPostModule {}

@@ -7,11 +7,11 @@ import { PostCommentResolver } from './post-comment.resolver';
 import { PostComment } from './entities';
 
 @Module({
-  providers: [PostCommentResolver, PostCommentService],
   imports: [
     TypeOrmModule.forFeature([PostComment]),
     UserModule,
     BlogPostModule,
   ],
+  providers: [PostCommentResolver, PostCommentService],
 })
 export class PostCommentModule {}

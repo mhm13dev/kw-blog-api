@@ -8,16 +8,16 @@ import { AuthResolver } from './auth.resolver';
 import { AccessTokenStrategy, RefreshTokenStrategy } from './strategies';
 
 @Module({
+  imports: [
+    UserModule,
+    JwtModule.register({}),
+    TypeOrmModule.forFeature([UserSession]),
+  ],
   providers: [
     AuthResolver,
     AuthService,
     AccessTokenStrategy,
     RefreshTokenStrategy,
-  ],
-  imports: [
-    UserModule,
-    JwtModule.register({}),
-    TypeOrmModule.forFeature([UserSession]),
   ],
 })
 export class AuthModule {}
