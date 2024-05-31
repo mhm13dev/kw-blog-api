@@ -4,7 +4,7 @@ services:
     ports:
       - 27017:27017
     env_file:
-      - .env.migrate-mongo
+      - .env.migrations
     volumes:
       - mongodb-data:/data/db
 

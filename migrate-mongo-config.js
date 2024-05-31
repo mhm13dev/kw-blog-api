@@ -1,4 +1,4 @@
-require('dotenv').config({ path: '.env.migrate-mongo' });
+require('dotenv').config({ path: '.env.migrations' });
 
 const DB_HOST = process.env.MONGO_HOST;
 const DB_PORT = process.env.MONGO_PORT;
