@@ -1,6 +1,6 @@
 import { Field, InputType, ObjectType, PickType } from '@nestjs/graphql';
 import { IsNotEmpty } from 'class-validator';
-import { User } from '../../user/user.entity';
+import { User } from '../../user/entities';
 import { TokensPair } from '../types/jwt.types';
 
 @InputType()

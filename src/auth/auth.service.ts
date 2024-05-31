@@ -8,7 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Repository } from 'typeorm';
 import { ObjectId } from 'mongodb';
 import { instanceToPlain } from 'class-transformer';
-import { User } from 'src/user/user.entity';
+import { User } from 'src/user/entities';
 import { UserService } from 'src/user/user.service';
 import { ConfigService } from 'src/config/config.service';
 import { UserSession } from './entities/user-session.entity';
