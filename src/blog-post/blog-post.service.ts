@@ -5,7 +5,6 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ObjectId } from 'mongodb';
 import { TokenPayload } from 'src/auth/types/jwt.types';
 import { PaginationInput } from 'src/common/dto';
 import { CreateBlogPostInput, UpdateBlogPostInput } from './dto';
@@ -32,7 +31,7 @@ export class BlogPostService {
     input: CreateBlogPostInput,
   ): Promise<BlogPost> {
     const blogPost = this.blogPostRepository.create({
-      author_id: new ObjectId(currentUserPayload.sub),
+      author_id: currentUserPayload.sub,
       title: input.title,
       content: input.content,
     });
@@ -51,7 +50,7 @@ export class BlogPostService {
   }: PaginationInput): Promise<BlogPost[]> {
     return this.blogPostRepository.find({
       order: {
-        createdAt: sort,
+        created_at: sort,
       },
       take: limit,
       skip: offset,
@@ -65,7 +64,7 @@ export class BlogPostService {
    */
   findOneById(id: string): Promise<BlogPost | null> {
     return this.blogPostRepository.findOneBy({
-      _id: new ObjectId(id),
+      id,
     });
   }
 
@@ -87,14 +86,14 @@ export class BlogPostService {
     input: UpdateBlogPostInput,
   ): Promise<BlogPost> {
     const blogPost = await this.blogPostRepository.findOneBy({
-      _id: input._id,
+      id: input.id,
     });
 
     if (!blogPost) {
       throw new NotFoundException('Post not found');
     }
 
-    if (!blogPost.author_id.equals(new ObjectId(currentUserPayload.sub))) {
+    if (blogPost.author_id !== currentUserPayload.sub) {
       throw new ForbiddenException('You are not allowed to update this post');
     }
 
@@ -114,22 +113,22 @@ export class BlogPostService {
    * All the associated `PostComment` with the `BlogPost` will be deleted by the `BlogPostSubscriber`.
    *
    * @param currentUserPayload - Logged in `User` payload
-   * @param _id - ID of the `BlogPost`
+   * @param id - ID of the `BlogPost`
    * @returns `true` if the `BlogPost` is deleted successfully
    * @throws `NotFoundException` If the `BlogPost` is not found
    * @throws `ForbiddenException` If the `User` is not the `author` of the `BlogPost`
    */
   async deleteBlogPost(
     currentUserPayload: TokenPayload,
-    _id: string,
+    id: string,
   ): Promise<boolean> {
     const blogPost = await this.blogPostRepository.findOneBy({
-      _id: new ObjectId(_id),
+      id,
     });
     if (!blogPost) {
       throw new NotFoundException('Post not found');
     }
-    if (!blogPost.author_id.equals(new ObjectId(currentUserPayload.sub))) {
+    if (blogPost.author_id !== currentUserPayload.sub) {
       throw new ForbiddenException('You are not the author of this post');
     }
     await this.blogPostRepository.remove(blogPost);

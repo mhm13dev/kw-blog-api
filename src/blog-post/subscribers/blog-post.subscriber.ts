@@ -27,7 +27,7 @@ export class BlogPostSubscriber implements EntitySubscriberInterface<BlogPost> {
    */
   async beforeRemove(event: RemoveEvent<BlogPost>) {
     await event.manager.delete(PostComment, {
-      post_id: event.entity?._id,
+      post_id: event.entity?.id,
     });
   }
 }

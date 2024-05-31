@@ -107,7 +107,7 @@ export class PostCommentService {
    */
   async deletePostComment(
     currentUserPayload: TokenPayload,
-    commentId: ObjectId,
+    commentId: string,
   ): Promise<boolean> {
     const postComment = await this.postCommentRepository.findOneBy({
       _id: commentId,

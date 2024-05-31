@@ -12,7 +12,7 @@ import { CurrentUserPayload } from 'src/auth/decorators';
 import { TokenPayload } from 'src/auth/types/jwt.types';
 import { UserService } from 'src/user/user.service';
 import { User } from 'src/user/entities';
-import { ObjectIdDto, PaginationInput } from 'src/common/dto';
+import { UUIDDTO, PaginationInput } from 'src/common/dto';
 import { Input } from 'src/common/graphql/args';
 import { CreateBlogPostInput, UpdateBlogPostInput } from './dto';
 import { BlogPost } from './entities';
@@ -71,10 +71,8 @@ export class BlogPostResolver {
   @Query(() => BlogPost, {
     name: 'post',
   })
-  async getOneBlogPost(@Input() input: ObjectIdDto): Promise<BlogPost> {
-    const post = await this.blogPostService.findOneById(
-      input._id.toHexString(),
-    );
+  async getOneBlogPost(@Input() input: UUIDDTO): Promise<BlogPost> {
+    const post = await this.blogPostService.findOneById(input.id);
     if (!post) {
       throw new NotFoundException('Post not found');
     }
@@ -110,12 +108,9 @@ export class BlogPostResolver {
   @UseGuards(GqlAccessTokenGuard)
   deleteBlogPost(
     @CurrentUserPayload() currentUserPayload: TokenPayload,
-    @Input() input: ObjectIdDto,
+    @Input() input: UUIDDTO,
   ): Promise<boolean> {
-    return this.blogPostService.deleteBlogPost(
-      currentUserPayload,
-      input._id.toHexString(),
-    );
+    return this.blogPostService.deleteBlogPost(currentUserPayload, input.id);
   }
 
   /**
@@ -126,9 +121,7 @@ export class BlogPostResolver {
    */
   @ResolveField('author', () => User)
   async getAuthor(@Parent() post: BlogPost): Promise<User> {
-    const author = await this.userService.findOneById(
-      post.author_id.toHexString(),
-    );
+    const author = await this.userService.findOneById(post.author_id);
     if (!author) {
       throw new NotFoundException('Author not found');
     }

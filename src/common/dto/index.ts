@@ -1,2 +1,2 @@
-export * from './object-id.dto';
+export * from './uuid.dto';
 export * from './pagination.dto';

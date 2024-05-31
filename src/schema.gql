@@ -21,29 +21,6 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
-type BlogPost {
-  _id: ID!
-  author_id: String!
-  author: User!
-  title: String!
-  content: String!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-}
-
-type PostComment {
-  _id: ID!
-  author_id: String!
-  author: User!
-  post_id: String!
-  post: BlogPost!
-  reply_to_comment_id: String
-  reply_to_comment: PostComment
-  content: String!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-}
-
 type LoginUserResponse {
   access_token: String!
   refresh_token: String!
@@ -55,8 +32,35 @@ type RefreshTokensResponse {
   refresh_token: String!
 }
 
+type BlogPost {
+  id: ID!
+  author_id: String!
+  author: User!
+  title: String!
+  content: String!
+  created_at: DateTime!
+  updated_at: DateTime!
+}
+
 type Query {
   me: User!
+  posts(input: PaginationInput): [BlogPost!]!
+  post(input: UUIDDTO!): BlogPost!
+}
+
+input PaginationInput {
+  limit: Int = 10
+  offset: Int = 0
+  sort: SortOrder = DESC
+}
+
+enum SortOrder {
+  ASC
+  DESC
+}
+
+input UUIDDTO {
+  id: String!
 }
 
 type Mutation {
@@ -64,6 +68,9 @@ type Mutation {
   loginUser(input: LoginUserInput!): LoginUserResponse!
   refreshTokens: RefreshTokensResponse!
   logout: Boolean!
+  createPost(input: CreateBlogPostInput!): BlogPost!
+  updatePost(input: UpdateBlogPostInput!): BlogPost!
+  deletePost(input: UUIDDTO!): Boolean!
 }
 
 input RegisterUserInput {
@@ -75,4 +82,15 @@ input RegisterUserInput {
 input LoginUserInput {
   email: String!
   password: String!
+}
+
+input CreateBlogPostInput {
+  title: String!
+  content: String!
+}
+
+input UpdateBlogPostInput {
+  title: String
+  content: String
+  id: String!
 }

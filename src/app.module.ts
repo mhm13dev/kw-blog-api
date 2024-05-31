@@ -7,7 +7,7 @@ import { AppConfigModule } from './config/config.module';
 import { AppConfigService } from './config/config.service';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
-// import { BlogPostModule } from './blog-post/blog-post.module';
+import { BlogPostModule } from './blog-post/blog-post.module';
 // import { PostCommentModule } from './post-comment/post-comment.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -27,7 +27,7 @@ import { AppService } from './app.service';
     }),
     UserModule,
     AuthModule,
-    // BlogPostModule,
+    BlogPostModule,
     // PostCommentModule,
   ],
   controllers: [AppController],

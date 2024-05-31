@@ -3,10 +3,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  ObjectIdColumn,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { ObjectId } from 'mongodb';
 import { Transform } from 'class-transformer';
 import { MaxLength } from 'class-validator';
 import { User } from 'src/user/entities';
@@ -20,14 +21,18 @@ import { User } from 'src/user/entities';
 })
 export class BlogPost {
   @Field(() => ID)
-  @ObjectIdColumn()
-  _id: ObjectId;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Field(() => String)
   @Column()
-  author_id: ObjectId;
+  author_id: string;
 
   @Field(() => User)
+  @ManyToOne(() => User, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'author_id' })
   author: User;
 
   @Field(() => String)
@@ -43,14 +48,14 @@ export class BlogPost {
   content: string;
 
   @Field()
-  @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  createdAt: Date;
+  @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
+  created_at: Date;
 
   @Field()
   @UpdateDateColumn({
-    type: 'timestamp',
+    type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
     onUpdate: 'CURRENT_TIMESTAMP',
   })
-  updatedAt: Date;
+  updated_at: Date;
 }
