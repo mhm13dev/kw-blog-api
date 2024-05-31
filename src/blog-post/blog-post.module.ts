@@ -8,5 +8,6 @@ import { BlogPostResolver } from './blog-post.resolver';
 @Module({
   providers: [BlogPostResolver, BlogPostService],
   imports: [TypeOrmModule.forFeature([BlogPost]), UserModule],
+  exports: [BlogPostService],
 })
 export class BlogPostModule {}

@@ -42,6 +42,19 @@ type BlogPost {
   updatedAt: DateTime!
 }
 
+type PostComment {
+  _id: ID!
+  author_id: String!
+  author: User!
+  post_id: String!
+  post: BlogPost!
+  reply_to_comment_id: String
+  reply_to_comment: PostComment
+  content: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
 type Query {
   me: User!
   posts(input: GetAllBlogPostsInput): [BlogPost!]!
@@ -71,6 +84,7 @@ type Mutation {
   createPost(input: CreateBlogPostInput!): BlogPost!
   updatePost(input: UpdateBlogPostInput!): BlogPost!
   deletePost(input: ObjectIdDto!): Boolean!
+  createPostComment(input: CreatePostCommentInput!): PostComment!
 }
 
 input RegisterUserInput {
@@ -93,4 +107,10 @@ input UpdateBlogPostInput {
   title: String
   content: String
   _id: String!
+}
+
+input CreatePostCommentInput {
+  post_id: String
+  reply_to_comment_id: String
+  content: String!
 }
