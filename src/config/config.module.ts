@@ -6,26 +6,12 @@ import { validateConfig } from './helpers';
 @Module({})
 @Global()
 export class ConfigModule {
-  static register(nodeEnv: string): DynamicModule {
-    if (!nodeEnv) {
-      throw new Error(
-        'ConfigModule: NODE_ENV is not set in package.json scripts!',
-      );
-    }
-
-    const envFiles = [
-      `.env.${nodeEnv}.local`,
-      `.env.${nodeEnv}`,
-      '.env.local',
-      '.env',
-    ];
-
+  static register(envFilePath: string = '.env'): DynamicModule {
     return {
       module: ConfigModule,
       imports: [
         ConfigurationModule.forRoot({
-          envFilePath: envFiles,
-          expandVariables: true,
+          envFilePath: envFilePath,
           validate: validateConfig,
         }),
       ],

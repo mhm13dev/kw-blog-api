@@ -7,7 +7,7 @@ import { AppService } from './app.service';
 
 @Module({
   imports: [
-    ConfigModule.register(process.env.NODE_ENV),
+    ConfigModule.register(),
     TypeOrmModule.forRootAsync({
       useFactory: (configService: ConfigService) => {
         return configService.database.mongodb;
