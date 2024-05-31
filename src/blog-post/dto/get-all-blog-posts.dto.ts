@@ -11,7 +11,7 @@ registerEnumType(SortOrder, {
 });
 
 @InputType()
-export class GetBlogPostInput {
+export class GetAllBlogPostsInput {
   @Field(() => Int, { nullable: true })
   @IsInt()
   @Min(1)

@@ -44,11 +44,11 @@ type BlogPost {
 
 type Query {
   me: User!
-  posts(getBlogPostInput: GetBlogPostInput): [BlogPost!]!
+  posts(getAllBlogPostsInput: GetAllBlogPostsInput): [BlogPost!]!
   post(_id: String!): BlogPost!
 }
 
-input GetBlogPostInput {
+input GetAllBlogPostsInput {
   limit: Int = 10
   offset: Int = 0
   sort: SortOrder = DESC

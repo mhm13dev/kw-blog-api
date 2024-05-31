@@ -3,7 +3,7 @@ import { NotFoundException, UseGuards } from '@nestjs/common';
 import { GqlAccessTokenGuard } from 'src/auth/guards';
 import { CurrentUserPayload } from 'src/auth/decorators';
 import { TokenPayload } from 'src/auth/types/jwt.types';
-import { CreateBlogPostInput, GetBlogPostInput } from './dto';
+import { CreateBlogPostInput, GetAllBlogPostsInput } from './dto';
 import { BlogPost } from './entities';
 import { BlogPostService } from './blog-post.service';
 
@@ -26,11 +26,11 @@ export class BlogPostResolver {
   @Query(() => [BlogPost], {
     name: 'posts',
   })
-  getBlogPosts(
-    @Args('getBlogPostInput', { nullable: true })
-    getBlogPostInput: GetBlogPostInput,
+  getAllBlogPosts(
+    @Args('getAllBlogPostsInput', { nullable: true })
+    getAllBlogPostsInput: GetAllBlogPostsInput,
   ): Promise<BlogPost[]> {
-    return this.blogPostService.getBlogPosts(getBlogPostInput);
+    return this.blogPostService.getAllBlogPosts(getAllBlogPostsInput);
   }
 
   @Query(() => BlogPost, {
