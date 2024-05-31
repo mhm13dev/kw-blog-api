@@ -29,7 +29,7 @@ export class PostCommentService {
   ) {}
 
   /**
-   * Creates a new `PostComment` and saves it to the database and Index it in Elasticsearch.
+   * Creates a new `PostComment` and saves it to the database and Index it in Elasticsearch (via PostCommentSubscriber).
    *
    * If the `parent_comment_id` is provided, then the comment will be a reply (nested comment) to the comment with the provided `parent_comment_id`.
    * Otherwise, the comment will be a top-level comment on the post with the provided `post_id`.
@@ -78,12 +78,7 @@ export class PostCommentService {
       postComment.post_id = input.post_id;
     }
 
-    const savedPostComment = await this.postCommentRepository.save(postComment);
-
-    // Index the PostComment in Elasticsearch
-    this.indexPostComment(savedPostComment);
-
-    return savedPostComment;
+    return this.postCommentRepository.save(postComment);
   }
 
   /**
@@ -184,26 +179,5 @@ export class PostCommentService {
         },
       });
     }
-  }
-
-  /**
-   * Index `PostComment` in Elasticsearch.
-   * @param postComment - `PostComment` object with populated `author`
-   */
-  indexPostComment(postComment: PostComment): void {
-    this.elasticsearchService.index({
-      index: ES_POST_COMMENTS_INDEX,
-      id: postComment.id,
-      body: {
-        id: postComment.id,
-        content: postComment.content,
-        post_id: postComment.post_id,
-        parent_comment_id: postComment.parent_comment_id,
-        author: {
-          id: postComment.author_id,
-          name: postComment.author.name,
-        },
-      },
-    });
   }
 }

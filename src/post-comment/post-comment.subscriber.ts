@@ -3,6 +3,7 @@ import {
   DataSource,
   EntitySubscriberInterface,
   EventSubscriber,
+  InsertEvent,
   RemoveEvent,
 } from 'typeorm';
 import { ES_POST_COMMENTS_INDEX } from './constants';
@@ -27,12 +28,42 @@ export class PostCommentSubscriber
   }
 
   /**
+   * This method is called after the `PostComment` entity is inserted.
+   *
+   * It indexes the `PostComment` in Elasticsearch.
+   */
+  afterInsert(event: InsertEvent<PostComment>) {
+    this.indexPostComment(event.entity);
+  }
+
+  /**
    * This method is called before the `PostComment` entity is removed.
    *
    * It will delete the `PostComment` and all it's children recursively from the Elasticsearch index.
    */
-  async afterRemove(event: RemoveEvent<PostComment>) {
-    await this.deleteNestedPostComments([event.entityId]);
+  afterRemove(event: RemoveEvent<PostComment>) {
+    this.deleteNestedPostComments([event.entityId]);
+  }
+
+  /**
+   * Index `PostComment` in Elasticsearch.
+   * @param postComment - `PostComment` object with populated `author`
+   */
+  indexPostComment(postComment: PostComment) {
+    this.elasticsearchService.index({
+      index: ES_POST_COMMENTS_INDEX,
+      id: postComment.id,
+      body: {
+        id: postComment.id,
+        content: postComment.content,
+        post_id: postComment.post_id,
+        parent_comment_id: postComment.parent_comment_id,
+        author: {
+          id: postComment.author_id,
+          name: postComment.author.name,
+        },
+      },
+    });
   }
 
   /**

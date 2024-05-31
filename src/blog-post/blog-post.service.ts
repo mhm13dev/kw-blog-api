@@ -27,7 +27,7 @@ export class BlogPostService {
   ) {}
 
   /**
-   * Creates a new `BlogPost` and Index it in Elasticsearch
+   * Creates a new `BlogPost` and Index it in Elasticsearch (via BlogPostSubscriber).
    * @param currentUserPayload - Logged in `User` payload
    * @param input - Input data to create a new `BlogPost`
    * @returns Created `BlogPost` object from the database
@@ -49,9 +49,6 @@ export class BlogPostService {
     });
 
     const savedBlogPost = await this.blogPostRepository.save(blogPost);
-
-    // Index the blog post in Elasticsearch
-    this.indexBlogPost(savedBlogPost);
 
     return savedBlogPost;
   }
@@ -87,7 +84,7 @@ export class BlogPostService {
   }
 
   /**
-   * Update a `BlogPost` in Database and Elasticsearch
+   * Update a `BlogPost` in Database and Elasticsearch (via BlogPostSubscriber).
    *
    * Only the `author` of the `BlogPost` is allowed to update it.
    *
@@ -123,13 +120,7 @@ export class BlogPostService {
       content: input.content,
     });
 
-    const savedUpdatedBlogPost =
-      await this.blogPostRepository.save(updatedBlogPost);
-
-    // Index the updated BlogPost in Elasticsearch
-    this.indexBlogPost(savedUpdatedBlogPost);
-
-    return savedUpdatedBlogPost;
+    return this.blogPostRepository.save(updatedBlogPost);
   }
 
   /**
@@ -197,26 +188,5 @@ export class BlogPostService {
         body: mappings,
       });
     }
-  }
-
-  /**
-   * Index `BlogPost` in Elasticsearch
-   * @param blogPost - `BlogPost` object with populated `author`
-   */
-  indexBlogPost(blogPost: BlogPost): void {
-    this.elasticsearchService.update({
-      index: ES_BLOG_POSTS_INDEX,
-      id: blogPost.id,
-      doc: {
-        id: blogPost.id,
-        title: blogPost.title,
-        content: blogPost.content,
-        author: {
-          id: blogPost.author.id,
-          name: blogPost.author.name,
-        },
-      },
-      doc_as_upsert: true,
-    });
   }
 }
