@@ -1,7 +1,7 @@
 import { NotFoundException, UseGuards } from '@nestjs/common';
 import { Resolver, Query } from '@nestjs/graphql';
 import { GqlAccessTokenGuard } from 'src/auth/guards';
-import { CurrentUser } from 'src/auth/decorators';
+import { CurrentUserPayload } from 'src/auth/decorators';
 import { User } from './entities';
 import { UserService } from './user.service';
 
@@ -11,7 +11,7 @@ export class UserResolver {
 
   @Query(() => User)
   @UseGuards(GqlAccessTokenGuard)
-  async me(@CurrentUser('sub') userId: string): Promise<User> {
+  async me(@CurrentUserPayload('sub') userId: string): Promise<User> {
     const user = this.userService.findOneById(userId);
     if (!user) {
       throw new NotFoundException('User not found');

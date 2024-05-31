@@ -27,6 +27,11 @@ type LoginUserResponse {
   user: User!
 }
 
+type RefreshTokensResponse {
+  access_token: String!
+  refresh_token: String!
+}
+
 type Query {
   me: User!
 }
@@ -34,6 +39,7 @@ type Query {
 type Mutation {
   registerUser(registerUserInput: RegisterUserInput!): User!
   loginUser(loginUserInput: LoginUserInput!): LoginUserResponse!
+  refreshTokens: RefreshTokensResponse!
 }
 
 input RegisterUserInput {

@@ -3,6 +3,7 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Repository } from 'typeorm';
@@ -13,7 +14,12 @@ import { UserService } from 'src/user/user.service';
 import { ConfigService } from 'src/config/config.service';
 import { TokenPayload, TokensPair } from './types/jwt.types';
 import { UserSession } from './entities';
-import { LoginUserInput, LoginUserResponse, RegisterUserInput } from './dto';
+import {
+  LoginUserInput,
+  LoginUserResponse,
+  RefreshTokensResponse,
+  RegisterUserInput,
+} from './dto';
 
 @Injectable()
 export class AuthService {
@@ -58,13 +64,12 @@ export class AuthService {
       throw new BadRequestException('Invalid credentials');
     }
 
+    // Generate JWT Tokens
     const tokenPayload = new TokenPayload({
       sub: user._id.toHexString(),
       role: user.role,
       session_id: new ObjectId().toHexString(),
     });
-
-    // Generate JWT Tokens
     const tokensPair = await this.generateTokensPair(tokenPayload);
 
     // Create User Session
@@ -72,6 +77,44 @@ export class AuthService {
 
     return new LoginUserResponse({
       user,
+      access_token: tokensPair.access_token,
+      refresh_token: tokensPair.refresh_token,
+    });
+  }
+
+  async refreshTokens(
+    currentUserPayload: TokenPayload,
+    refreshToken: string,
+  ): Promise<RefreshTokensResponse> {
+    // Check if session exist
+    const userSession = await this.userSessionRepository.findOneBy({
+      _id: new ObjectId(currentUserPayload.session_id),
+    });
+
+    if (!userSession) {
+      throw new UnauthorizedException('Invalid session');
+    }
+
+    // Check if refresh token match
+    if (!(await userSession.compareRefreshToken(refreshToken))) {
+      // If doesn't match, delete session because someone is using an old refresh token of the current session. The refresh token is compromised.
+      await this.userSessionRepository.remove(userSession);
+      throw new UnauthorizedException('Compromised refresh token');
+    }
+
+    // Generate JWT Tokens
+    const tokenPayload = new TokenPayload({
+      sub: currentUserPayload.sub,
+      role: currentUserPayload.role,
+      session_id: currentUserPayload.session_id,
+    });
+    const tokensPair = await this.generateTokensPair(tokenPayload);
+
+    // Update User Session
+    userSession.refresh_token = tokensPair.refresh_token;
+    await this.userSessionRepository.save(userSession);
+
+    return new RefreshTokensResponse({
       access_token: tokensPair.access_token,
       refresh_token: tokensPair.refresh_token,
     });

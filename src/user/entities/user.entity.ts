@@ -76,7 +76,7 @@ export class User {
     }
   }
 
-  async comparePassword(attemptedPassword: string): Promise<boolean> {
+  comparePassword(attemptedPassword: string): Promise<boolean> {
     return argon2.verify(this.password, attemptedPassword);
   }
 }
