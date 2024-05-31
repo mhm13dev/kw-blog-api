@@ -124,7 +124,6 @@ export class AuthService {
    * @param currentUserPayload - Logged in `User` payload
    * @param refreshToken - Refresh token from the authorization header
    * @returns `access_token` and `refresh_token`
-   * @throws `UnauthorizedException` If `refreshToken` is invalid or expired
    * @throws `UnauthorizedException("Invalid session")` If the `UserSession` is not found i.e. `User` is logged out
    * @throws `UnauthorizedException("Compromised refresh token")` If an old `refreshToken` of the same `UserSession` is used
    */
