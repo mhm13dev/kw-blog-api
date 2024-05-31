@@ -2,9 +2,10 @@ import dotenv from 'dotenv';
 dotenv.config({
   path: '.env.migrations',
 });
-import { DataSource } from 'typeorm';
+import { DataSource, DataSourceOptions } from 'typeorm';
+import { SeederOptions } from 'typeorm-extension';
 
-export default new DataSource({
+const options: DataSourceOptions & SeederOptions = {
   type: 'postgres',
   username: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,
@@ -14,5 +15,8 @@ export default new DataSource({
   logging: true,
   synchronize: false,
   entities: ['**/*.entity.ts'],
+  seeds: ['./seeds/*.seed.ts'],
   migrations: ['./migrations/*.ts'],
-});
+};
+
+export default new DataSource(options);

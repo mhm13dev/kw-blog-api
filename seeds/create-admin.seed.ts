@@ -1,13 +1,11 @@
+import { DataSource } from 'typeorm';
+import { Seeder } from 'typeorm-extension';
 import { User, UserRole } from 'src/user/entities';
-import { AppDataSource } from './data-source';
 
-async function createAdmin() {
-  // Initialize TypeORM connection
-  await AppDataSource.initialize();
-
-  try {
+export default class UserSeeder implements Seeder {
+  public async run(dataSource: DataSource) {
     // Check if the admin already exists
-    const adminExists = await AppDataSource.manager.findOneBy(User, {
+    const adminExists = await dataSource.manager.findOneBy(User, {
       role: UserRole.admin,
     });
     if (!!adminExists) {
@@ -23,12 +21,8 @@ async function createAdmin() {
     admin.password = '12345678';
 
     // Save data to the database
-    await AppDataSource.manager.save(admin);
+    await dataSource.manager.save(admin);
 
     console.log('Admin created successfully');
-  } finally {
-    await AppDataSource.destroy();
   }
 }
-
-createAdmin().catch(console.error);

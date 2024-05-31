@@ -60,8 +60,12 @@ npm run typeorm:cli
 ```
 
 ```bash
-# Run the seed script to create an admin user
-npm run seed:create:admin
+# Run all seed scripts in ./seeds directory
+npm run typeorm:seed
+
+# Run a specific seed script by name
+npm run typeorm:seed -- --name ./seeds/create-admin.seed.ts
+
 ```
 
 ```bash
