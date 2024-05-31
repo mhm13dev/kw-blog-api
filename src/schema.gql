@@ -40,6 +40,7 @@ type Mutation {
   registerUser(registerUserInput: RegisterUserInput!): User!
   loginUser(loginUserInput: LoginUserInput!): LoginUserResponse!
   refreshTokens: RefreshTokensResponse!
+  logout: Boolean!
 }
 
 input RegisterUserInput {

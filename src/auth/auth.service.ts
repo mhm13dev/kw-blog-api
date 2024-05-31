@@ -120,6 +120,14 @@ export class AuthService {
     });
   }
 
+  async logout(currentUserPayload: TokenPayload): Promise<boolean> {
+    // Delete User Session
+    await this.userSessionRepository.delete({
+      _id: new ObjectId(currentUserPayload.session_id),
+    });
+    return true;
+  }
+
   private async generateTokensPair(payload: TokenPayload): Promise<TokensPair> {
     return new TokensPair({
       access_token: await this.jwtService.signAsync(instanceToPlain(payload), {

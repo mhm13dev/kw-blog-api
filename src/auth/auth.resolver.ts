@@ -43,4 +43,12 @@ export class AuthResolver {
     const refreshToken = context.req.headers.authorization.split(' ')[1];
     return this.authService.refreshTokens(currentUserPayload, refreshToken);
   }
+
+  @Mutation(() => Boolean)
+  @UseGuards(GqlRefreshTokenGuard)
+  async logout(
+    @CurrentUserPayload() currentUserPayload: TokenPayload,
+  ): Promise<boolean> {
+    return this.authService.logout(currentUserPayload);
+  }
 }
