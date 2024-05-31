@@ -1,15 +1,16 @@
 import { Field, InputType, PickType } from '@nestjs/graphql';
 import { IsNotEmpty, MinLength } from 'class-validator';
-import { User } from '../user.entity';
+import { User } from '../../user/user.entity';
 
 @InputType()
-export class CreateUserInput extends PickType(
-  User,
-  ['email', 'password'],
-  InputType,
-) {
+export class RegisterUserInput extends PickType(User, ['email'], InputType) {
   @Field()
   @MinLength(8)
   @IsNotEmpty()
   password: string;
+
+  @Field()
+  @MinLength(8)
+  @IsNotEmpty()
+  confirm_password: string;
 }

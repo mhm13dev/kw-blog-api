@@ -20,10 +20,11 @@ type Query {
 }
 
 type Mutation {
-  createUser(createUserInput: CreateUserInput!): User!
+  registerUser(registerUserInput: RegisterUserInput!): User!
 }
 
-input CreateUserInput {
+input RegisterUserInput {
   email: String!
   password: String!
+  confirm_password: String!
 }

@@ -2,7 +2,6 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ObjectId } from 'mongodb';
-import { CreateUserInput } from './dto/create-user.input';
 import { User } from './user.entity';
 
 @Injectable()
@@ -12,16 +11,7 @@ export class UserService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  async create(createUserInput: CreateUserInput) {
-    const user = this.userRepository.create({
-      name: createUserInput.email.split('@')[0],
-      email: createUserInput.email,
-      password: createUserInput.password, // TODO: hash password
-    });
-    return this.userRepository.save(user);
-  }
-
-  async findOne(_id: string) {
+  async getUserById(_id: string): Promise<User> {
     const user = await this.userRepository.findOneBy({
       _id: new ObjectId(_id),
     });
@@ -29,5 +19,16 @@ export class UserService {
       throw new NotFoundException('User not found');
     }
     return user;
+  }
+
+  create(user: Partial<User>): Promise<User> {
+    const preparedUser = this.userRepository.create(user);
+    return this.userRepository.save(preparedUser);
+  }
+
+  findOneByEmail(email: string): Promise<User | null> {
+    return this.userRepository.findOneBy({
+      email: email.toLowerCase().trim(),
+    });
   }
 }
