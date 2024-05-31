@@ -1,5 +1,7 @@
 import { Field, InputType, PartialType, PickType } from '@nestjs/graphql';
-import { IsMongoId } from 'class-validator';
+import { ObjectId } from 'mongodb';
+import { ToMongoObjectId } from 'src/common/transformers';
+import { IsMongoObjectId } from 'src/common/validators';
 import { BlogPost } from '../entities';
 
 @InputType()
@@ -8,7 +10,8 @@ export class UpdateBlogPostInput extends PickType(
   ['title', 'content'],
   InputType,
 ) {
-  @Field()
-  @IsMongoId()
-  _id: string;
+  @Field(() => String)
+  @IsMongoObjectId()
+  @ToMongoObjectId()
+  _id: ObjectId;
 }

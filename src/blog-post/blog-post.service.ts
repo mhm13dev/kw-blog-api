@@ -54,7 +54,7 @@ export class BlogPostService {
     input: UpdateBlogPostInput,
   ): Promise<BlogPost> {
     const blogPost = await this.blogPostRepository.findOneBy({
-      _id: new ObjectId(input._id),
+      _id: input._id,
       author_id: new ObjectId(currentUserPayload.sub),
     });
 

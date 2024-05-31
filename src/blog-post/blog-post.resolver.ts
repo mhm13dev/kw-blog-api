@@ -54,7 +54,9 @@ export class BlogPostResolver {
     name: 'post',
   })
   async getOneBlogPost(@Input() input: ObjectIdDto): Promise<BlogPost> {
-    const post = await this.blogPostService.findOneById(input._id);
+    const post = await this.blogPostService.findOneById(
+      input._id.toHexString(),
+    );
     if (!post) {
       throw new NotFoundException('Post not found');
     }
@@ -85,7 +87,10 @@ export class BlogPostResolver {
     @CurrentUserPayload() currentUserPayload: TokenPayload,
     @Input() input: ObjectIdDto,
   ): Promise<boolean> {
-    await this.blogPostService.deleteBlogPost(currentUserPayload, input._id);
+    await this.blogPostService.deleteBlogPost(
+      currentUserPayload,
+      input._id.toHexString(),
+    );
     return true;
   }
 }

@@ -1,9 +1,12 @@
 import { Field, InputType } from '@nestjs/graphql';
-import { IsMongoId } from 'class-validator';
+import { ObjectId } from 'mongodb';
+import { ToMongoObjectId } from '../transformers';
+import { IsMongoObjectId } from '../validators';
 
 @InputType()
 export class ObjectIdDto {
-  @Field()
-  @IsMongoId()
-  _id: string;
+  @Field(() => String)
+  @IsMongoObjectId()
+  @ToMongoObjectId()
+  _id: ObjectId;
 }
