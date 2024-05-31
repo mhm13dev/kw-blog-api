@@ -5,6 +5,13 @@ import {
 } from 'class-validator';
 import { ObjectId } from 'mongodb';
 
+/**
+ * This custom validator checks if the input value is a valid MongoDB `ObjectId`.
+ *
+ * We already have `IsMongoId` decorator in `class-validator` but
+ * it could not validate the instance of MongoDB `ObjectId` (transformed via `ToMongoObjectId` custom transformer).
+ * That's why we created a custom validator.
+ */
 export function IsMongoObjectId(
   validationOptions?: ValidationOptions,
 ): PropertyDecorator {
