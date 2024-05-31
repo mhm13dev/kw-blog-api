@@ -19,6 +19,6 @@ module.exports = {
   },
 
   async down(db) {
-    await db.collection('users').deleteOne({ email: 'admin@kwanso.com' });
+    await db.collection('users').deleteOne({ role: 'admin' });
   },
 };
