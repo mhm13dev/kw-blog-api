@@ -52,6 +52,15 @@ export class User {
   @Column()
   name: string;
 
+  /**
+   * The `User` can have 2 roles:
+   * - `admin`
+   * - `user`
+   *
+   * The `admin` will be created manually with a seed script.
+   *
+   * All other users who sign up will have the `user` role by default.
+   */
   @Field(() => UserRole)
   @Column({
     default: UserRole.user,

@@ -5,7 +5,7 @@ import { ObjectId } from 'mongodb';
 import { User, UserRole } from './entities';
 
 /**
- * Service for operations on the `User` entity
+ * Service for operations on the `User` entity.
  */
 @Injectable()
 export class UserService {
@@ -15,7 +15,7 @@ export class UserService {
   ) {}
 
   /**
-   * Creates a new `User` in the database
+   * Creates a new `User` in the database.
    * @param user - Input data for the `User`
    * @returns Created `User` object from the database
    */
@@ -25,7 +25,7 @@ export class UserService {
   }
 
   /**
-   * Finds a `User` by email
+   * Finds a `User` by email.
    * @param email - Email of the `User`
    * @returns `User` if found, `null` otherwise
    */
@@ -36,7 +36,7 @@ export class UserService {
   }
 
   /**
-   * Finds a `User` by id
+   * Finds a `User` by id.
    * @param id - ID of the `User`
    * @returns `User` if found, `null` otherwise
    */
@@ -45,7 +45,7 @@ export class UserService {
   }
 
   /**
-   * Checks if a `User` with role of `admin` exists
+   * Checks if a `User` with role of `admin` exists.
    * @returns `true` if a `User` with role of `admin` exists, otherwise `false`
    */
   async doesAdminExist(): Promise<boolean> {

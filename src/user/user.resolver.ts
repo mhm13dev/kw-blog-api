@@ -15,7 +15,7 @@ export class UserResolver {
   constructor(private readonly userService: UserService) {}
 
   /**
-   * Query to get the currently logged in User
+   * Query to get the currently logged in User.
    * @param userId - ID of the user
    * @returns `User` object of the currently logged in user
    * @throws `NotFoundException` If the user is not found
