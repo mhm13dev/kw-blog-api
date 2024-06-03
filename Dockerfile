@@ -35,4 +35,4 @@ COPY --chown=node:node . .
 
 EXPOSE 5001
 
-CMD ["npm", "run", "start:prod"]
+CMD ["node", "dist/src/main.js"]
