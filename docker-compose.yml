@@ -1,15 +1,37 @@
 services:
-  blog-api:
-    image: node:20-alpine
-    working_dir: /app
-    ports:
-      - ${PORT}:${PORT}
+  development_setup:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development_setup
+    depends_on:
+      postgres:
+        condition: service_healthy
+      es01:
+        condition: service_healthy
+    env_file:
+      - .env
+    command: sh -c "export POSTGRES_HOST=${POSTGRES_HOST} npm install && npm run typeorm:migration:run && npm run typeorm:seed"
     volumes:
       - .:/app
+    profiles:
+      - development
+
+  blog-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
     depends_on:
-      - postgres
-      - es01
-    command: sh -c "export POSTGRES_HOST=${POSTGRES_HOST} npm install && npm run typeorm:migration:run && npm run typeorm:seed && npm run start:dev"
+      development_setup:
+        condition: service_completed_successfully
+    ports:
+      - ${PORT}:${PORT}
+    working_dir: /app
+    volumes:
+      - .:/app
+    profiles:
+      - development
 
   postgres:
     image: postgres:16
@@ -20,7 +42,14 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - postgres-data-dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    profiles:
+      - development
 
   es_setup:
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
@@ -44,34 +73,51 @@ services:
         curl -s -u elastic:${ELASTIC_USER_PASSWORD} -X POST "http://es01:9200/_security/user/kibana_system/_password" -H "Content-Type: application/json" -d"{\"password\":\"${KIBANA_SYSTEM_USER_PASSWORD}\"}";
         echo "\nAll Done!";
       '
+    profiles:
+      - development
+
   es01:
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     depends_on:
       - es_setup
-    volumes:
-      - esdata01:/usr/share/elasticsearch/data
     ports:
       - ${ELASTIC_SEARCH_PORT}:9200
+    volumes:
+      - esdata01-dev:/usr/share/elasticsearch/data
     environment:
       - node.name=es01
       - discovery.type=single-node
       - xpack.security.enabled=true
       - ELASTIC_PASSWORD=${ELASTIC_USER_PASSWORD}
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'curl -s -u elastic:${ELASTIC_USER_PASSWORD} http://es01:9200/_cluster/health?wait_for_status=yellow&timeout=30s',
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    profiles:
+      - development
+
   kibana:
+    image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
     depends_on:
       - es_setup
       - es01
-    image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
-    volumes:
-      - kibanadata:/usr/share/kibana/data
     ports:
       - ${KIBANA_PORT}:5601
     environment:
       - ELASTICSEARCH_HOSTS=http://es01:9200
       - ELASTICSEARCH_USERNAME=kibana_system
       - ELASTICSEARCH_PASSWORD=${KIBANA_SYSTEM_USER_PASSWORD}
+    volumes:
+      - kibanadata-dev:/usr/share/kibana/data
+    profiles:
+      - development
 
 volumes:
-  postgres-data:
-  esdata01:
-  kibanadata:
+  postgres-data-dev:
+  esdata01-dev:
+  kibanadata-dev:
