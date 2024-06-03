@@ -11,7 +11,7 @@ services:
         condition: service_healthy
     env_file:
       - .env
-    command: sh -c "export POSTGRES_HOST=${POSTGRES_HOST} npm install && npm run typeorm:migration:run && npm run typeorm:seed"
+    command: npm install
     volumes:
       - .:/app
     profiles:
@@ -28,6 +28,7 @@ services:
     ports:
       - ${PORT}:${PORT}
     working_dir: /app
+    command: sh -c "export POSTGRES_HOST=${POSTGRES_HOST} && npm run typeorm:migration:run && npm run typeorm:seed && npm run start:dev"
     volumes:
       - .:/app
     profiles:
