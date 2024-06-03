@@ -31,8 +31,11 @@ COPY --chown=node:node ./package*.json ./
 
 RUN npm ci
 
+EXPOSE 5001
+
 COPY --chown=node:node . .
 
-EXPOSE 5001
+RUN npm run build
+
 
 CMD ["node", "dist/src/main.js"]
