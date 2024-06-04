@@ -63,9 +63,9 @@ export class ConfigDto {
 
   @IsNotEmpty()
   @IsString()
-  ELASTIC_SEARCH_API_KEY_ID: string;
+  ELASTIC_USER_NAME: string;
 
   @IsNotEmpty()
   @IsString()
-  ELASTIC_SEARCH_API_KEY: string;
+  ELASTIC_USER_PASSWORD: string;
 }

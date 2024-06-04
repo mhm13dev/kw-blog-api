@@ -24,10 +24,8 @@ export function getConfig(): IConfig {
       ELASTIC_SEARCH: {
         node: `http://${process.env.ELASTIC_SEARCH_HOST}:${process.env.ELASTIC_SEARCH_PORT}`,
         auth: {
-          apiKey: {
-            id: process.env.ELASTIC_SEARCH_API_KEY_ID!,
-            api_key: process.env.ELASTIC_SEARCH_API_KEY!,
-          },
+          username: process.env.ELASTIC_USER_NAME!,
+          password: process.env.ELASTIC_USER_PASSWORD!,
         },
       },
     },
